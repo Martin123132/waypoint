@@ -1,0 +1,13 @@
+services:
+  waypoint:
+    build: .
+    ports:
+      - "4040:4040"
+    environment:
+      WAYPOINT_PUBLIC_URL: "http://localhost:4040"
+      WAYPOINT_DB: "/app/data/waypoint.sqlite"
+    volumes:
+      - waypoint-data:/app/data
+
+volumes:
+  waypoint-data:
