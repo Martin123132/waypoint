@@ -11,6 +11,7 @@ const requiredFiles = [
   'LICENSE',
   'CONTRIBUTING.md',
   'SECURITY.md',
+  'LOCAL_STORAGE_POLICY.md',
   'PROJECT_STATUS.md',
   'docs/release-review-outcome-template.md',
   'docs/release-review-outcome.sample.md',
@@ -72,6 +73,7 @@ assertIncludes('README.md', '[![CI](https://github.com/Martin123132/waypoint/act
 assertIncludes('README.md', '[Contributing](CONTRIBUTING.md)')
 assertIncludes('README.md', '[Security Policy](SECURITY.md)')
 assertIncludes('README.md', '[Project Status](PROJECT_STATUS.md)')
+assertIncludes('README.md', '[Local Storage Policy](LOCAL_STORAGE_POLICY.md)')
 assertIncludes('README.md', '[Release review outcome template](docs/release-review-outcome-template.md)')
 assertIncludes('README.md', '[Release review dry-run sample](docs/release-review-outcome.sample.md)')
 assertIncludes('README.md', '.github/ISSUE_TEMPLATE/domain-routing.yml')
@@ -87,6 +89,8 @@ assertIncludes('PROJECT_STATUS.md', 'npm run verify')
 assertIncludes('PROJECT_STATUS.md', 'synthetic-only proof material')
 assertIncludes('PROJECT_STATUS.md', 'docs/release-review-outcome-template.md')
 assertIncludes('PROJECT_STATUS.md', 'GitHub Actions CI URL')
+assertIncludes('PROJECT_STATUS.md', 'LOCAL_STORAGE_POLICY.md')
+assertIncludes('PROJECT_STATUS.md', 'npm run test:storage')
 assertIncludes('PROJECT_STATUS.md', 'npm run release:review:dry-run')
 assertIncludes('PROJECT_STATUS.md', 'npm run release:review:write')
 assertIncludes('PROJECT_STATUS.md', 'docs/release-review-outcome.sample.md')

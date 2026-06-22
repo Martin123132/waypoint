@@ -148,6 +148,7 @@ npx playwright install chromium
 - [Contributing](CONTRIBUTING.md)
 - [Security Policy](SECURITY.md)
 - [Project Status](PROJECT_STATUS.md)
+- [Local Storage Policy](LOCAL_STORAGE_POLICY.md)
 - [Synthetic routing demo](examples/synthetic-routing-demo.json)
 - [Release review outcome template](docs/release-review-outcome-template.md)
 - [Release review dry-run sample](docs/release-review-outcome.sample.md)

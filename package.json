@@ -16,11 +16,12 @@
     "release:review:write": "node scripts/generate-release-review-outcome.mjs --write",
     "start": "node dist-server/index.js",
     "lint": "eslint .",
-    "verify": "npm run lint && npm run test:readiness && npm run test:examples && npm test && npm run test:ui",
+    "verify": "npm run lint && npm run test:storage && npm run test:readiness && npm run test:examples && npm test && npm run test:ui",
     "test": "npm run build && npm run test:domain",
     "test:domain": "node tests/domain-routing.test.mjs",
     "test:examples": "node tests/examples.test.mjs",
     "test:readiness": "node tests/public-readiness.test.mjs",
+    "test:storage": "node tests/storage-policy.test.mjs",
     "test:ui": "node tests/guided-ui.test.mjs",
     "preview": "vite preview"
   },

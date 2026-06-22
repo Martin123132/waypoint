@@ -48,6 +48,8 @@ Reports should use synthetic domains, URLs, screenshots, and CSV rows. Do not po
 
 The current local workspace is `D:\CodexWork\openqr`. Generated data and caches should stay on D: and remain uncommitted.
 
+`LOCAL_STORAGE_POLICY.md` documents the D-drive storage rule. It is checked by `npm run test:storage` and the full `npm run verify` path.
+
 Ignored by design:
 
 - `node_modules`

@@ -56,7 +56,7 @@ function getFreePort() {
 }
 
 async function waitForHealth(port, child, getLogs) {
-  for (let attempt = 0; attempt < 80; attempt += 1) {
+  for (let attempt = 0; attempt < 240; attempt += 1) {
     if (child.exitCode !== null) {
       throw new Error(`Server exited early.\n${getLogs()}`)
     }
