@@ -31,10 +31,10 @@ $env:npm_config_userconfig='D:\CodexCache\npm\npmrc'
 $env:PLAYWRIGHT_BROWSERS_PATH='D:\CodexCache\playwright'
 ```
 
-Install and run:
+Install and run. Use `npm ci` for a lockfile-clean checkout; use `npm install` when intentionally updating dependencies.
 
 ```powershell
-npm install
+npm ci
 npm run dev
 ```
 
@@ -51,6 +51,7 @@ Optional environment variables:
 
 Waypoint uses `WAYPOINT_*` names for new installs. Existing `OPENQR_*` variables still work as fallbacks so older deployments do not break.
 
+- `PORT`: host-provided API/web port override; takes precedence over `WAYPOINT_PORT`
 - `WAYPOINT_PORT`: API/web port, default `4040`
 - `HOST`: bind host, default `127.0.0.1`
 - `WAYPOINT_DB`: SQLite database path, default `./data/waypoint.sqlite`
@@ -79,6 +80,8 @@ docker compose up --build
 ```
 
 Then open `http://localhost:4040`.
+
+The compose file stores SQLite data in the `waypoint-data` named volume and sets `WAYPOINT_PUBLIC_URL` for local access. Set `WAYPOINT_COOKIE_SECURE=1` when serving through HTTPS.
 
 ## API
 
@@ -117,11 +120,10 @@ Only `destination` is strictly required. If `title` is missing, Waypoint will de
 ## Verification
 
 ```powershell
-npm run lint
-npm run build
-npm run test:domain
-npm run test:ui
+npm run verify
 ```
+
+`npm run verify` runs lint, the production build, the domain-routing integration test, and the guided UI test. For narrower checks, use `npm run lint`, `npm run build`, `npm run test:domain`, or `npm run test:ui`.
 
 `npm test` runs the production build and then the domain-routing integration test. The test starts Waypoint on an isolated local port and writes its temporary SQLite database under `D:\CodexCache\waypoint\tests` by default. Override with `WAYPOINT_TEST_ROOT` and `WAYPOINT_TEMP_ROOT` if needed. The older `OPENQR_TEST_ROOT` and `OPENQR_TEMP_ROOT` names still work as fallbacks.
 
@@ -138,3 +140,7 @@ npx playwright install chromium
 - Team accounts
 - UTM builder
 - Privacy controls for analytics retention
+
+## License
+
+MIT

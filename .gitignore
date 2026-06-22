@@ -12,8 +12,15 @@ dist
 dist-server
 dist-ssr
 data
+coverage
+playwright-report
+test-results
+*.sqlite
+*.sqlite-*
 *.local
 .env
+.env.*
+!.env.example
 
 # Editor directories and files
 .vscode/*

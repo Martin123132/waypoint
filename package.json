@@ -2,7 +2,11 @@
   "name": "waypoint",
   "private": true,
   "version": "0.0.0",
+  "description": "Self-hosted dynamic QR code and short-link manager.",
   "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
   "scripts": {
     "dev": "concurrently -k -n api,web -c cyan,green \"npm:dev:api\" \"npm:dev:web\"",
     "dev:api": "tsx watch server/index.ts",
@@ -10,6 +14,7 @@
     "build": "tsc -b && vite build && tsc -p tsconfig.server.json",
     "start": "node dist-server/index.js",
     "lint": "eslint .",
+    "verify": "npm run lint && npm test && npm run test:ui",
     "test": "npm run build && npm run test:domain",
     "test:domain": "node tests/domain-routing.test.mjs",
     "test:ui": "node tests/guided-ui.test.mjs",
