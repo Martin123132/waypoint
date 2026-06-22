@@ -14,12 +14,13 @@ jobs:
     name: Verify
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    env:
-      WAYPOINT_PLAYWRIGHT_BROWSERS_PATH: ${{ runner.temp }}/waypoint-cache/playwright
 
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
+
+      - name: Configure test cache paths
+        run: echo "WAYPOINT_PLAYWRIGHT_BROWSERS_PATH=$RUNNER_TEMP/waypoint-cache/playwright" >> "$GITHUB_ENV"
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
