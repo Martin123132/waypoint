@@ -5,6 +5,7 @@ data
 coverage
 playwright-report
 test-results
+outputs
 tests
 *.log
 *.sqlite

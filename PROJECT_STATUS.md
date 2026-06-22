@@ -42,6 +42,8 @@ Reports should use synthetic domains, URLs, screenshots, and CSV rows. Do not po
 
 `npm run release:review:dry-run` prints a sanitized release-review outcome with placeholder CI URL/result fields. Its checked sample is `docs/release-review-outcome.sample.md`.
 
+`npm run release:review:write` writes the same dry-run report to `outputs/release-review-dry-run.md`. The `outputs/` directory is ignored and local-only unless a report is deliberately sanitized before sharing.
+
 ## Local Workspace Notes
 
 The current local workspace is `D:\CodexWork\openqr`. Generated data and caches should stay on D: and remain uncommitted.

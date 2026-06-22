@@ -1,5 +1,6 @@
 import { execFileSync } from 'node:child_process'
-import { existsSync, readdirSync, readFileSync } from 'node:fs'
+import { existsSync, mkdtempSync, readdirSync, readFileSync, rmSync } from 'node:fs'
+import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -87,7 +88,10 @@ assertIncludes('PROJECT_STATUS.md', 'synthetic-only proof material')
 assertIncludes('PROJECT_STATUS.md', 'docs/release-review-outcome-template.md')
 assertIncludes('PROJECT_STATUS.md', 'GitHub Actions CI URL')
 assertIncludes('PROJECT_STATUS.md', 'npm run release:review:dry-run')
+assertIncludes('PROJECT_STATUS.md', 'npm run release:review:write')
 assertIncludes('PROJECT_STATUS.md', 'docs/release-review-outcome.sample.md')
+assertIncludes('PROJECT_STATUS.md', 'outputs/release-review-dry-run.md')
+assertIncludes('PROJECT_STATUS.md', 'ignored and local-only')
 
 assertIncludes('SECURITY.md', 'GitHub private vulnerability reporting')
 assertIncludes('SECURITY.md', 'avoid posting exploit details')
@@ -151,7 +155,16 @@ assertIncludes('docs/release-review-outcome-template.md', 'No datasets, customer
 assertIncludes('docs/release-review-outcome-template.md', 'reserved/fake domains and `example.com` payloads')
 
 assert(packageJson.scripts?.['release:review:dry-run'] === 'node scripts/generate-release-review-outcome.mjs', 'package.json must expose release:review:dry-run')
+assert(packageJson.scripts?.['release:review:write'] === 'node scripts/generate-release-review-outcome.mjs --write', 'package.json must expose release:review:write')
+assertIncludes('.gitignore', 'outputs')
+assertIncludes('.dockerignore', 'outputs')
+assertIncludes('README.md', 'npm run release:review:write')
+assertIncludes('README.md', 'outputs/release-review-dry-run.md')
+assertIncludes('README.md', 'ignored by git')
+assertIncludes('README.md', 'deliberately sanitized')
 assertIncludes('scripts/generate-release-review-outcome.mjs', 'does not create a release, tag, package, deployment, or announcement')
+assertIncludes('scripts/generate-release-review-outcome.mjs', "join('outputs', 'release-review-dry-run.md')")
+assertIncludes('scripts/generate-release-review-outcome.mjs', '--out requires a file path')
 assertIncludes('scripts/generate-release-review-outcome.mjs', 'GitHub Actions CI URL')
 assertIncludes('scripts/generate-release-review-outcome.mjs', 'MIT/open source confirmed')
 assertIncludes('scripts/generate-release-review-outcome.mjs', 'No real QR payloads in proof material')
@@ -173,6 +186,23 @@ assert(
   generatedOutcome === readProjectFile('docs/release-review-outcome.sample.md'),
   'release-review dry-run generator output must match docs/release-review-outcome.sample.md',
 )
+
+const tempOutputRoot = mkdtempSync(join(tmpdir(), 'waypoint-release-review-'))
+try {
+  const tempOutputPath = join(tempOutputRoot, 'dry-run.md')
+  const writeMessage = execFileSync(
+    process.execPath,
+    [join(projectRoot, 'scripts/generate-release-review-outcome.mjs'), '--out', tempOutputPath],
+    { encoding: 'utf8' },
+  )
+  assert(writeMessage.includes(tempOutputPath), 'release-review dry-run writer should report the output path')
+  assert(
+    readFileSync(tempOutputPath, 'utf8') === readProjectFile('docs/release-review-outcome.sample.md'),
+    'release-review dry-run writer output must match docs/release-review-outcome.sample.md',
+  )
+} finally {
+  rmSync(tempOutputRoot, { recursive: true, force: true })
+}
 
 const secretPatterns = [
   /\bgh[pousr]_[A-Za-z0-9_]{20,}\b/g,

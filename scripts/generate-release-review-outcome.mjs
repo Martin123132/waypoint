@@ -1,3 +1,6 @@
+import { mkdirSync, writeFileSync } from 'node:fs'
+import { dirname, join } from 'node:path'
+
 const outcome = `# Release Review Dry-Run Outcome
 
 This is a public-safe dry-run outcome. It does not create a release, tag, package, deployment, or announcement.
@@ -56,4 +59,30 @@ This is a public-safe dry-run outcome. It does not create a release, tag, packag
 - Notes: \`<public-safe summary only>\`
 `
 
-process.stdout.write(outcome)
+function outputPathFromArgs(args) {
+  if (args.includes('--write')) {
+    return join('outputs', 'release-review-dry-run.md')
+  }
+
+  const outIndex = args.indexOf('--out')
+  if (outIndex !== -1) {
+    const value = args[outIndex + 1]
+    if (!value) {
+      throw new Error('--out requires a file path')
+    }
+
+    return value
+  }
+
+  return null
+}
+
+const outputPath = outputPathFromArgs(process.argv.slice(2))
+
+if (outputPath) {
+  mkdirSync(dirname(outputPath), { recursive: true })
+  writeFileSync(outputPath, outcome, 'utf8')
+  process.stdout.write(`Wrote release review dry-run outcome to ${outputPath}\n`)
+} else {
+  process.stdout.write(outcome)
+}

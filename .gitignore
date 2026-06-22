@@ -15,6 +15,7 @@ data
 coverage
 playwright-report
 test-results
+outputs
 *.sqlite
 *.sqlite-*
 *.local

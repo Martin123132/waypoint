@@ -157,6 +157,8 @@ npx playwright install chromium
   [privacy or security-sensitive report](.github/ISSUE_TEMPLATE/privacy-security-sensitive.yml),
   [release readiness review](.github/ISSUE_TEMPLATE/release-review.yml)
 
+Generate a local dry-run release-review report with `npm run release:review:write`. It writes to `outputs/release-review-dry-run.md`, which is ignored by git and intended to stay local unless deliberately sanitized.
+
 ## License
 
 MIT
