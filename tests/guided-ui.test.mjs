@@ -153,6 +153,15 @@ async function run() {
     await createPanel.getByText('Paste a full https:// destination').waitFor({ timeout: 10000 })
     await createPanel.getByRole('textbox', { name: 'Title' }).fill('Guided Path')
     await createPanel.getByRole('textbox', { name: 'Destination URL' }).fill('https://example.com/guided')
+    await createPanel.getByRole('textbox', { name: 'UTM source' }).fill('newsletter')
+    await createPanel.getByRole('textbox', { name: 'UTM medium' }).fill('qr')
+    await createPanel.getByRole('textbox', { name: 'UTM campaign' }).fill('summer launch')
+    await createPanel.getByRole('button', { name: 'Apply UTM' }).click()
+    const taggedDestination = 'https://example.com/guided?utm_source=newsletter&utm_medium=qr&utm_campaign=summer+launch'
+    assert(
+      (await createPanel.getByRole('textbox', { name: 'Destination URL' }).inputValue()) === taggedDestination,
+      'UTM builder did not update the create destination URL',
+    )
     await createPanel.getByRole('textbox', { name: 'Slug' }).fill(slug)
     await createPanel.getByText('Destination ready').waitFor({ timeout: 10000 })
     await createPanel.getByText(`Preview slug: ${slug}`).waitFor({ timeout: 10000 })
@@ -164,6 +173,17 @@ async function run() {
     await detailPanel.getByText('Share kit').waitFor({ timeout: 10000 })
     await shareCard.getByText(`${baseUrl}/r/${slug}`).waitFor({ timeout: 10000 })
     await detailPanel.getByText('Destination ready').waitFor({ timeout: 10000 })
+    assert(
+      (await detailPanel.getByRole('textbox', { name: 'Destination URL' }).inputValue()) === taggedDestination,
+      'Created link did not preserve the tagged destination URL',
+    )
+    await detailPanel.getByRole('textbox', { name: 'Edit UTM source' }).fill('retargeting')
+    await detailPanel.getByRole('button', { name: 'Apply UTM' }).click()
+    const retaggedDestination = 'https://example.com/guided?utm_source=retargeting&utm_medium=qr&utm_campaign=summer+launch'
+    assert(
+      (await detailPanel.getByRole('textbox', { name: 'Destination URL' }).inputValue()) === retaggedDestination,
+      'Edit UTM builder did not update the draft destination URL',
+    )
     await detailPanel.getByRole('link', { name: 'SVG' }).waitFor({ timeout: 10000 })
     await detailPanel.getByRole('textbox', { name: 'Note' }).fill('QA note')
     await detailPanel.getByText('Unsaved edits').waitFor({ timeout: 10000 })

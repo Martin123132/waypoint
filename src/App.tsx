@@ -60,6 +60,12 @@ type LinkDraft = {
   qrBackground: string
 }
 
+type UtmDraft = {
+  source: string
+  medium: string
+  campaign: string
+}
+
 const emptyCreateForm: CreateLinkInput = {
   title: '',
   destination: '',
@@ -68,6 +74,12 @@ const emptyCreateForm: CreateLinkInput = {
   description: '',
   qrForeground: '#071318',
   qrBackground: '#ffffff',
+}
+
+const emptyUtmForm: UtmDraft = {
+  source: '',
+  medium: '',
+  campaign: '',
 }
 
 function toDraft(link: LinkSummary): LinkDraft {
@@ -124,6 +136,24 @@ function isHttpUrl(value: string) {
   } catch {
     return false
   }
+}
+
+function destinationWithUtm(destination: string, utm: UtmDraft) {
+  const url = new URL(destination)
+  const fields = {
+    utm_source: utm.source,
+    utm_medium: utm.medium,
+    utm_campaign: utm.campaign,
+  }
+
+  for (const [key, value] of Object.entries(fields)) {
+    const trimmed = value.trim()
+    if (trimmed) {
+      url.searchParams.set(key, trimmed)
+    }
+  }
+
+  return url.toString()
 }
 
 function MetricCard({
@@ -302,8 +332,10 @@ function Dashboard({ user, onLogout }: { user: AuthUser | null; onLogout: () => 
   const [domains, setDomains] = useState<DomainSummary[]>([])
   const [selectedId, setSelectedId] = useState('')
   const [createForm, setCreateForm] = useState<CreateLinkInput>(emptyCreateForm)
+  const [utmForm, setUtmForm] = useState<UtmDraft>(emptyUtmForm)
   const [domainForm, setDomainForm] = useState(emptyDomainForm)
   const [draft, setDraft] = useState<LinkDraft | null>(null)
+  const [draftUtmForm, setDraftUtmForm] = useState<UtmDraft>(emptyUtmForm)
   const [analytics, setAnalytics] = useState<LinkAnalytics | null>(null)
   const [importFile, setImportFile] = useState<File | null>(null)
   const [importResult, setImportResult] = useState<ImportResult | null>(null)
@@ -380,6 +412,7 @@ function Dashboard({ user, onLogout }: { user: AuthUser | null; onLogout: () => 
   const launchProgress = Math.round((completedStepCount / guideSteps.length) * 100)
   const createPreviewSlug = useMemo(() => previewSlug(createForm.slug || createForm.title), [createForm.slug, createForm.title])
   const createDestinationReady = useMemo(() => isHttpUrl(createForm.destination), [createForm.destination])
+  const createUtmReady = useMemo(() => Object.values(utmForm).some((value) => value.trim()), [utmForm])
   const createDomainPreview = useMemo(() => {
     if (createForm.domainId === null) {
       return null
@@ -411,6 +444,7 @@ function Dashboard({ user, onLogout }: { user: AuthUser | null; onLogout: () => 
     )
   }, [draft, selected])
   const draftDestinationReady = useMemo(() => (draft ? isHttpUrl(draft.destination) : false), [draft])
+  const draftUtmReady = useMemo(() => Object.values(draftUtmForm).some((value) => value.trim()), [draftUtmForm])
   const nextMove = useMemo(() => {
     if (links.length === 0) {
       return {
@@ -498,6 +532,7 @@ function Dashboard({ user, onLogout }: { user: AuthUser | null; onLogout: () => 
       setLinks(items)
       setSelectedId(nextSelected?.id ?? '')
       setDraft(nextSelected ? toDraft(nextSelected) : null)
+      setDraftUtmForm(emptyUtmForm)
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : 'Could not load links')
     } finally {
@@ -560,6 +595,7 @@ function Dashboard({ user, onLogout }: { user: AuthUser | null; onLogout: () => 
         description: createForm.description?.trim() || undefined,
       })
       setCreateForm(emptyCreateForm)
+      setUtmForm(emptyUtmForm)
       await refreshLinks(created.id)
       flash('Link created')
     } catch (caught) {
@@ -567,6 +603,34 @@ function Dashboard({ user, onLogout }: { user: AuthUser | null; onLogout: () => 
     } finally {
       setBusy('')
     }
+  }
+
+  function handleApplyCreateUtm() {
+    if (!createDestinationReady) {
+      setError('Add a valid destination URL before applying campaign tags')
+      return
+    }
+
+    setCreateForm({
+      ...createForm,
+      destination: destinationWithUtm(createForm.destination, utmForm),
+    })
+    setError('')
+    flash('Campaign tags applied')
+  }
+
+  function handleApplyDraftUtm() {
+    if (!draft || !draftDestinationReady) {
+      setError('Add a valid destination URL before applying campaign tags')
+      return
+    }
+
+    setDraft({
+      ...draft,
+      destination: destinationWithUtm(draft.destination, draftUtmForm),
+    })
+    setError('')
+    flash('Campaign tags applied')
   }
 
   async function handleImport(event: FormEvent<HTMLFormElement>) {
@@ -938,6 +1002,42 @@ function Dashboard({ user, onLogout }: { user: AuthUser | null; onLogout: () => 
                     {createDestinationReady ? 'Destination ready' : 'Paste a full https:// destination'}
                   </small>
                 </label>
+                <div className="utm-builder" aria-label="UTM builder">
+                  <div className="utm-fields">
+                    <label>
+                      UTM source
+                      <input
+                        value={utmForm.source}
+                        onChange={(event) => setUtmForm({ ...utmForm, source: event.target.value })}
+                        placeholder="newsletter"
+                      />
+                    </label>
+                    <label>
+                      UTM medium
+                      <input
+                        value={utmForm.medium}
+                        onChange={(event) => setUtmForm({ ...utmForm, medium: event.target.value })}
+                        placeholder="qr"
+                      />
+                    </label>
+                    <label>
+                      UTM campaign
+                      <input
+                        value={utmForm.campaign}
+                        onChange={(event) => setUtmForm({ ...utmForm, campaign: event.target.value })}
+                        placeholder="launch"
+                      />
+                    </label>
+                  </div>
+                  <button
+                    className="secondary-button"
+                    disabled={!createDestinationReady || !createUtmReady}
+                    onClick={handleApplyCreateUtm}
+                    type="button"
+                  >
+                    Apply UTM
+                  </button>
+                </div>
                 <label>
                   Slug
                   <input
@@ -1141,6 +1241,7 @@ function Dashboard({ user, onLogout }: { user: AuthUser | null; onLogout: () => 
                     onClick={() => {
                       setSelectedId(link.id)
                       setDraft(toDraft(link))
+                      setDraftUtmForm(emptyUtmForm)
                       setDeleteConfirmId('')
                     }}
                   >
@@ -1223,6 +1324,42 @@ function Dashboard({ user, onLogout }: { user: AuthUser | null; onLogout: () => 
                         type="url"
                       />
                     </label>
+                    <div className="utm-builder" aria-label="Edit UTM builder">
+                      <div className="utm-fields">
+                        <label>
+                          Edit UTM source
+                          <input
+                            value={draftUtmForm.source}
+                            onChange={(event) => setDraftUtmForm({ ...draftUtmForm, source: event.target.value })}
+                            placeholder="newsletter"
+                          />
+                        </label>
+                        <label>
+                          Edit UTM medium
+                          <input
+                            value={draftUtmForm.medium}
+                            onChange={(event) => setDraftUtmForm({ ...draftUtmForm, medium: event.target.value })}
+                            placeholder="qr"
+                          />
+                        </label>
+                        <label>
+                          Edit UTM campaign
+                          <input
+                            value={draftUtmForm.campaign}
+                            onChange={(event) => setDraftUtmForm({ ...draftUtmForm, campaign: event.target.value })}
+                            placeholder="launch"
+                          />
+                        </label>
+                      </div>
+                      <button
+                        className="secondary-button"
+                        disabled={!draftDestinationReady || !draftUtmReady}
+                        onClick={handleApplyDraftUtm}
+                        type="button"
+                      >
+                        Apply UTM
+                      </button>
+                    </div>
                     <label>
                       Slug
                       <input

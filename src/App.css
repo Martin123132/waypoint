@@ -580,6 +580,21 @@ input[type='file'] {
   gap: 10px;
 }
 
+.utm-builder {
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid #e1e8f0;
+  border-radius: 8px;
+  background: #f8fafc;
+}
+
+.utm-fields {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
 .create-preview {
   display: grid;
   gap: 5px;
@@ -1244,6 +1259,10 @@ button:disabled {
   }
 
   .bulk-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .utm-fields {
     grid-template-columns: 1fr;
   }
 
