@@ -10,6 +10,7 @@ const requiredFiles = [
   'CONTRIBUTING.md',
   'SECURITY.md',
   'PROJECT_STATUS.md',
+  'docs/release-review-outcome-template.md',
   '.github/workflows/ci.yml',
   '.github/ISSUE_TEMPLATE/config.yml',
   '.github/ISSUE_TEMPLATE/domain-routing.yml',
@@ -67,6 +68,7 @@ assertIncludes('README.md', '[![CI](https://github.com/Martin123132/waypoint/act
 assertIncludes('README.md', '[Contributing](CONTRIBUTING.md)')
 assertIncludes('README.md', '[Security Policy](SECURITY.md)')
 assertIncludes('README.md', '[Project Status](PROJECT_STATUS.md)')
+assertIncludes('README.md', '[Release review outcome template](docs/release-review-outcome-template.md)')
 assertIncludes('README.md', '.github/ISSUE_TEMPLATE/domain-routing.yml')
 assertIncludes('README.md', '.github/ISSUE_TEMPLATE/guided-ui-qr-flow.yml')
 assertIncludes('README.md', '.github/ISSUE_TEMPLATE/privacy-security-sensitive.yml')
@@ -78,6 +80,8 @@ assertIncludes('PROJECT_STATUS.md', 'Do not post secrets')
 assertIncludes('PROJECT_STATUS.md', 'Release Readiness')
 assertIncludes('PROJECT_STATUS.md', 'npm run verify')
 assertIncludes('PROJECT_STATUS.md', 'synthetic-only proof material')
+assertIncludes('PROJECT_STATUS.md', 'docs/release-review-outcome-template.md')
+assertIncludes('PROJECT_STATUS.md', 'GitHub Actions CI URL')
 
 assertIncludes('SECURITY.md', 'GitHub private vulnerability reporting')
 assertIncludes('SECURITY.md', 'avoid posting exploit details')
@@ -125,6 +129,20 @@ assertIncludes('.github/ISSUE_TEMPLATE/release-review.yml', 'MIT license is pres
 assertIncludes('.github/ISSUE_TEMPLATE/release-review.yml', 'Examples use only `go.example.test`, `qr.example.test`, and `example.com` payloads.')
 assertIncludes('.github/ISSUE_TEMPLATE/release-review.yml', 'real QR payloads')
 assertIncludes('.github/ISSUE_TEMPLATE/release-review.yml', 'production domains')
+
+assertIncludes('docs/release-review-outcome-template.md', 'does not create a release, tag, package, deployment, or announcement')
+assertIncludes('docs/release-review-outcome-template.md', 'Local verification command: `npm run verify`')
+assertIncludes('docs/release-review-outcome-template.md', 'Public readiness command: `npm run test:readiness`')
+assertIncludes('docs/release-review-outcome-template.md', 'Synthetic examples command: `npm run test:examples`')
+assertIncludes('docs/release-review-outcome-template.md', 'GitHub Actions CI URL: `https://github.com/Martin123132/waypoint/actions/runs/<run-id>`')
+assertIncludes('docs/release-review-outcome-template.md', 'MIT/open source confirmed')
+assertIncludes('docs/release-review-outcome-template.md', 'SECURITY.md')
+assertIncludes('docs/release-review-outcome-template.md', 'No real QR payloads in proof material')
+assertIncludes('docs/release-review-outcome-template.md', 'No private URLs in proof material')
+assertIncludes('docs/release-review-outcome-template.md', 'No secrets, credentials, cookies, tokens, or API keys in proof material')
+assertIncludes('docs/release-review-outcome-template.md', 'No production domains in proof material')
+assertIncludes('docs/release-review-outcome-template.md', 'No datasets, customer data, personal data, internal logs, private screenshots, or proprietary material')
+assertIncludes('docs/release-review-outcome-template.md', 'reserved/fake domains and `example.com` payloads')
 
 const secretPatterns = [
   /\bgh[pousr]_[A-Za-z0-9_]{20,}\b/g,

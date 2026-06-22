@@ -149,6 +149,7 @@ npx playwright install chromium
 - [Security Policy](SECURITY.md)
 - [Project Status](PROJECT_STATUS.md)
 - [Synthetic routing demo](examples/synthetic-routing-demo.json)
+- [Release review outcome template](docs/release-review-outcome-template.md)
 - Issue templates:
   [domain routing](.github/ISSUE_TEMPLATE/domain-routing.yml),
   [guided UI/QR flow](.github/ISSUE_TEMPLATE/guided-ui-qr-flow.yml),

@@ -38,6 +38,8 @@ Reports should use synthetic domains, URLs, screenshots, and CSV rows. Do not po
 
 `.github/ISSUE_TEMPLATE/release-review.yml` provides a pre-release review checklist. It requires `npm run verify`, public readiness, the examples verifier, CI on `main`, MIT/open-source posture, and synthetic-only proof material. It does not create a release, tag, package, or deployment.
 
+`docs/release-review-outcome-template.md` provides a dry-run evidence record for future release review outcomes. It records local verification, public readiness, examples verification, GitHub Actions CI URL, synthetic demo status, MIT/open-source posture, security guidance, and confirmation that proof material contains no real QR payloads, private URLs, secrets, production domains, datasets, or proprietary material.
+
 ## Local Workspace Notes
 
 The current local workspace is `D:\CodexWork\openqr`. Generated data and caches should stay on D: and remain uncommitted.
