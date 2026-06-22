@@ -34,6 +34,10 @@ Reports should use synthetic domains, URLs, screenshots, and CSV rows. Do not po
 
 `examples/synthetic-routing-demo.json` documents a safe branded-domain and QR-flow scenario with reserved example domains and an `example.com` destination. It is checked by `npm run test:examples` and the full `npm run verify` path.
 
+## Release Readiness
+
+`.github/ISSUE_TEMPLATE/release-review.yml` provides a pre-release review checklist. It requires `npm run verify`, public readiness, the examples verifier, CI on `main`, MIT/open-source posture, and synthetic-only proof material. It does not create a release, tag, package, or deployment.
+
 ## Local Workspace Notes
 
 The current local workspace is `D:\CodexWork\openqr`. Generated data and caches should stay on D: and remain uncommitted.

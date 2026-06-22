@@ -152,7 +152,8 @@ npx playwright install chromium
 - Issue templates:
   [domain routing](.github/ISSUE_TEMPLATE/domain-routing.yml),
   [guided UI/QR flow](.github/ISSUE_TEMPLATE/guided-ui-qr-flow.yml),
-  [privacy or security-sensitive report](.github/ISSUE_TEMPLATE/privacy-security-sensitive.yml)
+  [privacy or security-sensitive report](.github/ISSUE_TEMPLATE/privacy-security-sensitive.yml),
+  [release readiness review](.github/ISSUE_TEMPLATE/release-review.yml)
 
 ## License
 

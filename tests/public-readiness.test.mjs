@@ -15,6 +15,7 @@ const requiredFiles = [
   '.github/ISSUE_TEMPLATE/domain-routing.yml',
   '.github/ISSUE_TEMPLATE/guided-ui-qr-flow.yml',
   '.github/ISSUE_TEMPLATE/privacy-security-sensitive.yml',
+  '.github/ISSUE_TEMPLATE/release-review.yml',
 ]
 
 const publicReadinessFiles = [
@@ -27,6 +28,7 @@ const issueFormFiles = [
   '.github/ISSUE_TEMPLATE/domain-routing.yml',
   '.github/ISSUE_TEMPLATE/guided-ui-qr-flow.yml',
   '.github/ISSUE_TEMPLATE/privacy-security-sensitive.yml',
+  '.github/ISSUE_TEMPLATE/release-review.yml',
 ]
 
 function assert(condition, message) {
@@ -68,10 +70,14 @@ assertIncludes('README.md', '[Project Status](PROJECT_STATUS.md)')
 assertIncludes('README.md', '.github/ISSUE_TEMPLATE/domain-routing.yml')
 assertIncludes('README.md', '.github/ISSUE_TEMPLATE/guided-ui-qr-flow.yml')
 assertIncludes('README.md', '.github/ISSUE_TEMPLATE/privacy-security-sensitive.yml')
+assertIncludes('README.md', '.github/ISSUE_TEMPLATE/release-review.yml')
 
 assertIncludes('PROJECT_STATUS.md', 'Public Issue Intake')
 assertIncludes('PROJECT_STATUS.md', 'synthetic domains, URLs, screenshots, and CSV rows')
 assertIncludes('PROJECT_STATUS.md', 'Do not post secrets')
+assertIncludes('PROJECT_STATUS.md', 'Release Readiness')
+assertIncludes('PROJECT_STATUS.md', 'npm run verify')
+assertIncludes('PROJECT_STATUS.md', 'synthetic-only proof material')
 
 assertIncludes('SECURITY.md', 'GitHub private vulnerability reporting')
 assertIncludes('SECURITY.md', 'avoid posting exploit details')
@@ -110,6 +116,15 @@ for (const file of issueFormFiles) {
   const contents = readProjectFile(file)
   assert(contents.toLowerCase().includes('do not'), `${file} must include a public-safety "Do not" warning`)
 }
+
+assertIncludes('.github/ISSUE_TEMPLATE/release-review.yml', 'Opening this issue does not create a GitHub release')
+assertIncludes('.github/ISSUE_TEMPLATE/release-review.yml', '`npm run verify` passes locally.')
+assertIncludes('.github/ISSUE_TEMPLATE/release-review.yml', 'Public readiness check passes through `npm run test:readiness`.')
+assertIncludes('.github/ISSUE_TEMPLATE/release-review.yml', 'Synthetic example verifier passes through `npm run test:examples`.')
+assertIncludes('.github/ISSUE_TEMPLATE/release-review.yml', 'MIT license is present')
+assertIncludes('.github/ISSUE_TEMPLATE/release-review.yml', 'Examples use only `go.example.test`, `qr.example.test`, and `example.com` payloads.')
+assertIncludes('.github/ISSUE_TEMPLATE/release-review.yml', 'real QR payloads')
+assertIncludes('.github/ISSUE_TEMPLATE/release-review.yml', 'production domains')
 
 const secretPatterns = [
   /\bgh[pousr]_[A-Za-z0-9_]{20,}\b/g,

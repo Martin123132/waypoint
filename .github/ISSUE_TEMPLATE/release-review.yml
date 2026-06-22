@@ -1,0 +1,54 @@
+name: Release readiness review
+description: Checklist for preparing a future release without publishing one.
+title: "[release-review] "
+labels:
+  - release-readiness
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this issue before a future release. Opening this issue does not create a GitHub release, tag, package, or deployment.
+
+        Keep proof material synthetic-only. Do not include secrets, cookies, credentials, private URLs, real QR payloads, production domains, customer data, personal data, private logs, datasets, screenshots with sensitive values, or proprietary material.
+  - type: checkboxes
+    id: verification
+    attributes:
+      label: Verification
+      options:
+        - label: "`npm run verify` passes locally."
+          required: true
+        - label: GitHub Actions CI is green on `main`.
+          required: true
+        - label: Public readiness check passes through `npm run test:readiness`.
+          required: true
+        - label: Synthetic example verifier passes through `npm run test:examples`.
+          required: true
+  - type: checkboxes
+    id: public_posture
+    attributes:
+      label: Public open-source posture
+      options:
+        - label: MIT license is present and unchanged unless a deliberate legal review happened.
+          required: true
+        - label: README links to contributor, security, status, issue-intake, and synthetic demo material.
+          required: true
+        - label: Security guidance still points vulnerability reports away from public exploit details.
+          required: true
+  - type: checkboxes
+    id: synthetic_proof
+    attributes:
+      label: Synthetic proof material
+      options:
+        - label: Examples use only `go.example.test`, `qr.example.test`, and `example.com` payloads.
+          required: true
+        - label: Proof docs do not include real QR payloads, production domains, private URLs, datasets, credentials, cookies, or secrets.
+          required: true
+        - label: Any screenshots or generated proof artifacts are synthetic, redacted, and intentionally committed.
+          required: true
+  - type: textarea
+    id: notes
+    attributes:
+      label: Release notes draft
+      description: Public-safe summary only. Do not paste private URLs, real QR payloads, credentials, internal logs, or customer data.
+      placeholder: Summarize user-facing changes, compatibility notes, and verification evidence.
+
