@@ -40,6 +40,8 @@ Reports should use synthetic domains, URLs, screenshots, and CSV rows. Do not po
 
 `docs/release-review-outcome-template.md` provides a dry-run evidence record for future release review outcomes. It records local verification, public readiness, examples verification, GitHub Actions CI URL, synthetic demo status, MIT/open-source posture, security guidance, and confirmation that proof material contains no real QR payloads, private URLs, secrets, production domains, datasets, or proprietary material.
 
+`npm run release:review:dry-run` prints a sanitized release-review outcome with placeholder CI URL/result fields. Its checked sample is `docs/release-review-outcome.sample.md`.
+
 ## Local Workspace Notes
 
 The current local workspace is `D:\CodexWork\openqr`. Generated data and caches should stay on D: and remain uncommitted.

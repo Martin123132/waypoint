@@ -1,3 +1,4 @@
+import { execFileSync } from 'node:child_process'
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -11,6 +12,8 @@ const requiredFiles = [
   'SECURITY.md',
   'PROJECT_STATUS.md',
   'docs/release-review-outcome-template.md',
+  'docs/release-review-outcome.sample.md',
+  'scripts/generate-release-review-outcome.mjs',
   '.github/workflows/ci.yml',
   '.github/ISSUE_TEMPLATE/config.yml',
   '.github/ISSUE_TEMPLATE/domain-routing.yml',
@@ -69,6 +72,7 @@ assertIncludes('README.md', '[Contributing](CONTRIBUTING.md)')
 assertIncludes('README.md', '[Security Policy](SECURITY.md)')
 assertIncludes('README.md', '[Project Status](PROJECT_STATUS.md)')
 assertIncludes('README.md', '[Release review outcome template](docs/release-review-outcome-template.md)')
+assertIncludes('README.md', '[Release review dry-run sample](docs/release-review-outcome.sample.md)')
 assertIncludes('README.md', '.github/ISSUE_TEMPLATE/domain-routing.yml')
 assertIncludes('README.md', '.github/ISSUE_TEMPLATE/guided-ui-qr-flow.yml')
 assertIncludes('README.md', '.github/ISSUE_TEMPLATE/privacy-security-sensitive.yml')
@@ -82,6 +86,8 @@ assertIncludes('PROJECT_STATUS.md', 'npm run verify')
 assertIncludes('PROJECT_STATUS.md', 'synthetic-only proof material')
 assertIncludes('PROJECT_STATUS.md', 'docs/release-review-outcome-template.md')
 assertIncludes('PROJECT_STATUS.md', 'GitHub Actions CI URL')
+assertIncludes('PROJECT_STATUS.md', 'npm run release:review:dry-run')
+assertIncludes('PROJECT_STATUS.md', 'docs/release-review-outcome.sample.md')
 
 assertIncludes('SECURITY.md', 'GitHub private vulnerability reporting')
 assertIncludes('SECURITY.md', 'avoid posting exploit details')
@@ -143,6 +149,30 @@ assertIncludes('docs/release-review-outcome-template.md', 'No secrets, credentia
 assertIncludes('docs/release-review-outcome-template.md', 'No production domains in proof material')
 assertIncludes('docs/release-review-outcome-template.md', 'No datasets, customer data, personal data, internal logs, private screenshots, or proprietary material')
 assertIncludes('docs/release-review-outcome-template.md', 'reserved/fake domains and `example.com` payloads')
+
+assert(packageJson.scripts?.['release:review:dry-run'] === 'node scripts/generate-release-review-outcome.mjs', 'package.json must expose release:review:dry-run')
+assertIncludes('scripts/generate-release-review-outcome.mjs', 'does not create a release, tag, package, deployment, or announcement')
+assertIncludes('scripts/generate-release-review-outcome.mjs', 'GitHub Actions CI URL')
+assertIncludes('scripts/generate-release-review-outcome.mjs', 'MIT/open source confirmed')
+assertIncludes('scripts/generate-release-review-outcome.mjs', 'No real QR payloads in proof material')
+assertIncludes('scripts/generate-release-review-outcome.mjs', 'No private URLs in proof material')
+assertIncludes('scripts/generate-release-review-outcome.mjs', 'No secrets, credentials, cookies, tokens, or API keys in proof material')
+assertIncludes('scripts/generate-release-review-outcome.mjs', 'No production domains in proof material')
+assertIncludes('scripts/generate-release-review-outcome.mjs', 'Proof material uses only reserved/fake domains')
+assertIncludes('docs/release-review-outcome.sample.md', 'This is a public-safe dry-run outcome')
+assertIncludes('docs/release-review-outcome.sample.md', 'Local verification command: `npm run verify`')
+assertIncludes('docs/release-review-outcome.sample.md', 'GitHub Actions CI URL: `https://github.com/Martin123132/waypoint/actions/runs/<run-id>`')
+assertIncludes('docs/release-review-outcome.sample.md', 'Demo QR payload: `http://go.example.test/launch`')
+assertIncludes('docs/release-review-outcome.sample.md', 'MIT/open source confirmed')
+assertIncludes('docs/release-review-outcome.sample.md', 'No datasets, customer data, personal data, internal logs, private screenshots, or proprietary material')
+
+const generatedOutcome = execFileSync(process.execPath, [join(projectRoot, 'scripts/generate-release-review-outcome.mjs')], {
+  encoding: 'utf8',
+})
+assert(
+  generatedOutcome === readProjectFile('docs/release-review-outcome.sample.md'),
+  'release-review dry-run generator output must match docs/release-review-outcome.sample.md',
+)
 
 const secretPatterns = [
   /\bgh[pousr]_[A-Za-z0-9_]{20,}\b/g,

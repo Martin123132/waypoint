@@ -12,6 +12,7 @@
     "dev:api": "tsx watch server/index.ts",
     "dev:web": "vite --host 127.0.0.1",
     "build": "tsc -b && vite build && tsc -p tsconfig.server.json",
+    "release:review:dry-run": "node scripts/generate-release-review-outcome.mjs",
     "start": "node dist-server/index.js",
     "lint": "eslint .",
     "verify": "npm run lint && npm run test:readiness && npm run test:examples && npm test && npm run test:ui",
