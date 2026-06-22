@@ -10,7 +10,7 @@ body:
       value: |
         Stop before posting sensitive material.
 
-        Do not include secrets, cookies, passwords, tokens, private URLs, production domains, real QR payloads, customer data, personal data, internal logs, or exploit code.
+        Do not post or include secrets, cookies, passwords, tokens, private URLs, production domains, real QR payloads, customer data, personal data, internal logs, or exploit code.
 
         For a vulnerability, use GitHub private vulnerability reporting if available from the Security tab. If private reporting is unavailable, keep this issue high-level and ask for a private reporting path.
   - type: dropdown
@@ -53,4 +53,3 @@ body:
       options:
         - label: I have not included secrets, credentials, cookies, private URLs, real QR payloads, customer data, or personal data.
           required: true
-
