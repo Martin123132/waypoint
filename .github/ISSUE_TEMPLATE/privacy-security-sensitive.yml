@@ -1,0 +1,56 @@
+name: Privacy or security-sensitive report
+description: Ask for help with privacy-sensitive behavior without posting secrets or exploit details.
+title: "[privacy/security] "
+labels:
+  - privacy
+  - security
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Stop before posting sensitive material.
+
+        Do not include secrets, cookies, passwords, tokens, private URLs, production domains, real QR payloads, customer data, personal data, internal logs, or exploit code.
+
+        For a vulnerability, use GitHub private vulnerability reporting if available from the Security tab. If private reporting is unavailable, keep this issue high-level and ask for a private reporting path.
+  - type: dropdown
+    id: report_type
+    attributes:
+      label: Report type
+      options:
+        - Possible vulnerability
+        - Privacy-sensitive behavior
+        - Data retention or deletion concern
+        - Authentication/session concern
+        - Unsure
+    validations:
+      required: true
+  - type: textarea
+    id: public_summary
+    attributes:
+      label: Public-safe summary
+      description: Describe the concern without enough detail to exploit it or identify private data.
+      placeholder: A session or redirect behavior appears to expose more information than expected.
+    validations:
+      required: true
+  - type: textarea
+    id: affected_area
+    attributes:
+      label: Affected area
+      placeholder: Authentication, cookies, redirects, analytics events, CSV import/export, QR downloads, Docker deployment, etc.
+    validations:
+      required: true
+  - type: textarea
+    id: safe_reproduction
+    attributes:
+      label: Safe reproduction outline
+      description: Use synthetic data only and omit exploit details.
+      placeholder: This occurs in a local test setup with example.test domains and placeholder destinations.
+  - type: checkboxes
+    id: safety_check
+    attributes:
+      label: Safety check
+      options:
+        - label: I have not included secrets, credentials, cookies, private URLs, real QR payloads, customer data, or personal data.
+          required: true
+

@@ -1,0 +1,52 @@
+name: Domain routing bug
+description: Report branded-domain, fallback URL, or redirect behavior that is wrong.
+title: "[domain] "
+labels:
+  - domain-routing
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for checking Waypoint's routing path.
+
+        Please use synthetic hostnames and URLs. Do not include real customer domains, private redirect targets, access tokens, cookies, production logs, or personal data.
+  - type: textarea
+    id: summary
+    attributes:
+      label: What happened?
+      description: Describe the wrong routing, fallback, redirect, or branded-domain behavior.
+      placeholder: A link assigned to go.example.test redirected through /r/:slug instead of the branded host.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What should have happened?
+      placeholder: The branded URL should have resolved at http://go.example.test/demo and redirected to the destination.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Minimal reproduction
+      description: Use local or synthetic values only.
+      placeholder: |
+        1. Start Waypoint with WAYPOINT_DOMAIN_PROTOCOL=http
+        2. Add domain go.example.test
+        3. Create link slug demo assigned to that domain
+        4. Request /demo with Host: go.example.test
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version or commit
+      placeholder: main at 12129fb, or a tagged version when available
+  - type: textarea
+    id: safe_logs
+    attributes:
+      label: Sanitized logs or response details
+      description: Remove cookies, real domains, private destinations, IP addresses, and tokens before posting.
+      render: shell
+

@@ -148,6 +148,10 @@ npx playwright install chromium
 - [Contributing](CONTRIBUTING.md)
 - [Security Policy](SECURITY.md)
 - [Project Status](PROJECT_STATUS.md)
+- Issue templates:
+  [domain routing](.github/ISSUE_TEMPLATE/domain-routing.yml),
+  [guided UI/QR flow](.github/ISSUE_TEMPLATE/guided-ui-qr-flow.yml),
+  [privacy or security-sensitive report](.github/ISSUE_TEMPLATE/privacy-security-sensitive.yml)
 
 ## License
 

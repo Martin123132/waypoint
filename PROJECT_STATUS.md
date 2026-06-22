@@ -20,6 +20,16 @@ Waypoint is a self-hosted dynamic QR code and short-link manager. It is intended
 - New sessions use `waypoint_session`.
 - Existing `openqr_session` cookies are still accepted during the rename transition.
 
+## Public Issue Intake
+
+GitHub issue forms are available for:
+
+- Domain routing and branded-host bugs
+- Guided UI, QR download, CSV, and mobile flow regressions
+- Privacy or security-sensitive reports
+
+Reports should use synthetic domains, URLs, screenshots, and CSV rows. Do not post secrets, private URLs, production QR payloads, cookies, credentials, personal data, customer data, or internal logs.
+
 ## Local Workspace Notes
 
 The current local workspace is `D:\CodexWork\openqr`. Generated data and caches should stay on D: and remain uncommitted.
@@ -33,4 +43,3 @@ Ignored by design:
 - `.env`
 - SQLite databases
 - Playwright/test output
-

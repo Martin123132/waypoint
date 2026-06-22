@@ -1,0 +1,64 @@
+name: Guided UI or QR flow regression
+description: Report dashboard, guided path, QR download, import/export, or mobile layout regressions.
+title: "[ui] "
+labels:
+  - guided-ui
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please keep screenshots and examples public-safe.
+
+        Do not upload QR codes or CSV files that encode private links, credentials, customer data, personal data, or unreleased campaign URLs. Use `https://example.com` style placeholders.
+  - type: textarea
+    id: summary
+    attributes:
+      label: What broke?
+      placeholder: The QR pack download button is disabled after creating the first link.
+    validations:
+      required: true
+  - type: dropdown
+    id: surface
+    attributes:
+      label: Affected surface
+      options:
+        - First-run setup/login
+        - Guided create flow
+        - Link editor/detail panel
+        - QR preview/download
+        - CSV import/export
+        - Mobile layout
+        - Analytics
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Start from a fresh local database
+        2. Create a link to https://example.com
+        3. Open the detail panel
+        4. Click QR pack
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      placeholder: The QR pack download should begin and the UI should stay usable.
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Browser and viewport
+      placeholder: Chromium, 1440x960 desktop or 390x844 mobile
+  - type: textarea
+    id: safe_media
+    attributes:
+      label: Public-safe screenshot or notes
+      description: Redact QR codes, private destinations, emails, domains, and tokens before attaching screenshots.
+
