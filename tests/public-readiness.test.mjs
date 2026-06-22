@@ -57,6 +57,8 @@ for (const file of requiredFiles) {
 }
 
 const workflow = readProjectFile('.github/workflows/ci.yml')
+assert(workflow.includes('actions/checkout@v5'), 'CI workflow must use checkout v5')
+assert(workflow.includes('actions/setup-node@v5'), 'CI workflow must use setup-node v5')
 assert(workflow.includes('npm run verify'), 'CI workflow must run npm run verify')
 assert(workflow.includes('node-version: 24'), 'CI workflow must use Node.js 24')
 assert(workflow.includes('pull_request:'), 'CI workflow must run for pull requests')
