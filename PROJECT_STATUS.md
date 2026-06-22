@@ -50,6 +50,8 @@ The current local workspace is `D:\CodexWork\openqr`. Generated data and caches 
 
 `LOCAL_STORAGE_POLICY.md` documents the D-drive storage rule. It is checked by `npm run test:storage` and the full `npm run verify` path.
 
+Use `npm run ci:d-drive`, `npm run dev:d-drive`, or `npm run verify:d-drive` on Windows to launch those commands with D-drive cache, temp, Playwright, and test database paths.
+
 Ignored by design:
 
 - `node_modules`

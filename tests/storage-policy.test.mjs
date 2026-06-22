@@ -16,6 +16,7 @@ const checkedFiles = [
   'tests/guided-ui.test.mjs',
   'tests/public-readiness.test.mjs',
   'scripts/generate-release-review-outcome.mjs',
+  'scripts/with-d-drive-cache.mjs',
 ]
 
 function assert(condition, message) {
@@ -44,9 +45,16 @@ for (const file of checkedFiles) {
 
 assertIncludes('README.md', "D:\\CodexCache\\npm")
 assertIncludes('README.md', "D:\\CodexCache\\playwright")
+assertIncludes('README.md', 'npm run verify:d-drive')
 assertIncludes('PROJECT_STATUS.md', 'Generated data and caches should stay on D:')
 assertIncludes('LOCAL_STORAGE_POLICY.md', 'Do not commit absolute C drive paths.')
 assertIncludes('LOCAL_STORAGE_POLICY.md', 'npm run test:storage')
+assertIncludes('LOCAL_STORAGE_POLICY.md', 'npm run verify:d-drive')
+assertIncludes('package.json', '"verify:d-drive"')
+assertIncludes('package.json', '"ci:d-drive"')
+assertIncludes('package.json', '"dev:d-drive"')
+assertIncludes('scripts/with-d-drive-cache.mjs', "D:\\\\CodexCache")
+assertIncludes('scripts/with-d-drive-cache.mjs', 'WAYPOINT_TEST_ROOT')
 
 assertIncludes('tests/domain-routing.test.mjs', "process.platform === 'win32' ? 'D:\\\\CodexCache'")
 assertIncludes('tests/guided-ui.test.mjs', "process.platform === 'win32' ? 'D:\\\\CodexCache'")

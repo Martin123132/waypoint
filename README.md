@@ -40,6 +40,14 @@ npm ci
 npm run dev
 ```
 
+On this Windows development machine, the checked D-drive wrappers set the cache, temp, browser, and test database paths before launching the child command:
+
+```powershell
+npm run ci:d-drive
+npm run dev:d-drive
+npm run verify:d-drive
+```
+
 The API defaults to `http://127.0.0.1:4040`. Vite will print the dashboard URL, usually `http://127.0.0.1:5173/` unless that port is already occupied.
 
 ## Production
