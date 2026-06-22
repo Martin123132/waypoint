@@ -1,0 +1,43 @@
+{
+  "name": "synthetic-routing-demo",
+  "purpose": "Public-safe proof fixture for Waypoint branded-domain routing and QR flow.",
+  "privacy": {
+    "classification": "synthetic",
+    "rules": [
+      "Use reserved example domains only.",
+      "Use placeholder QR payloads only.",
+      "Do not include secrets, cookies, credentials, customer data, personal data, private URLs, production domains, or real QR payloads."
+    ]
+  },
+  "appOrigin": "http://qr.example.test",
+  "domain": {
+    "hostname": "go.example.test",
+    "label": "Example Go",
+    "protocol": "http",
+    "isPrimary": true
+  },
+  "link": {
+    "title": "Example launch",
+    "slug": "launch",
+    "destination": "https://example.com/waypoint-demo",
+    "description": "Synthetic demo link for public documentation.",
+    "active": true,
+    "qrForeground": "#071318",
+    "qrBackground": "#ffffff"
+  },
+  "expected": {
+    "brandedShortUrl": "http://go.example.test/launch",
+    "fallbackShortUrl": "http://qr.example.test/r/launch",
+    "qrPayload": "http://go.example.test/launch",
+    "redirectTarget": "https://example.com/waypoint-demo"
+  },
+  "guidedFlow": [
+    "Create admin account in a local or throwaway demo database.",
+    "Add go.example.test as the primary branded domain.",
+    "Create the launch link with destination https://example.com/waypoint-demo.",
+    "Confirm the detail panel shows the branded URL and QR preview.",
+    "Download the SVG QR code and verify it encodes http://go.example.test/launch.",
+    "Confirm /launch on go.example.test redirects to https://example.com/waypoint-demo.",
+    "Confirm /r/launch on qr.example.test remains the fallback route."
+  ]
+}

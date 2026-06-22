@@ -30,6 +30,10 @@ GitHub issue forms are available for:
 
 Reports should use synthetic domains, URLs, screenshots, and CSV rows. Do not post secrets, private URLs, production QR payloads, cookies, credentials, personal data, customer data, or internal logs.
 
+## Public Proof Fixtures
+
+`examples/synthetic-routing-demo.json` documents a safe branded-domain and QR-flow scenario with reserved example domains and an `example.com` destination. It is checked by `npm run test:examples` and the full `npm run verify` path.
+
 ## Local Workspace Notes
 
 The current local workspace is `D:\CodexWork\openqr`. Generated data and caches should stay on D: and remain uncommitted.
