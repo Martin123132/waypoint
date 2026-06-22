@@ -38,7 +38,20 @@ for (const phrase of requiredSafetyPhrases) {
   assert(fixtureText.includes(phrase), `Fixture is missing safety phrase: ${phrase}`)
 }
 
-for (const phrase of ['public-safe fixtures only', 'real QR payloads', 'npm run test:examples']) {
+const requiredReadmePhrases = [
+  'public-safe fixtures only',
+  'real QR payloads',
+  'Walkthrough',
+  'fake-domain only',
+  'guided UI/detail panel',
+  'QR preview or downloaded SVG',
+  'fallback route',
+  'Expected public-safe routing',
+  'npm run test:examples',
+  'npm run verify',
+]
+
+for (const phrase of requiredReadmePhrases) {
   assert(examplesReadme.includes(phrase), `examples/README.md is missing: ${phrase}`)
 }
 
@@ -63,6 +76,37 @@ assert(fallbackShortUrl.pathname === `/r/${fixture.link.slug}`, 'Fallback URL mu
 
 assert(qrPayload.href === brandedShortUrl.href, 'QR payload must encode the branded short URL')
 assert(fixture.expected.redirectTarget === fixture.link.destination, 'Expected redirect target must match destination')
+
+const readmeValuesFromFixture = [
+  fixture.appOrigin,
+  fixture.domain.hostname,
+  fixture.link.title,
+  fixture.link.slug,
+  fixture.link.destination,
+  fixture.expected.brandedShortUrl,
+  fixture.expected.fallbackShortUrl,
+  fixture.expected.qrPayload,
+  fixture.expected.redirectTarget,
+]
+
+for (const value of readmeValuesFromFixture) {
+  assert(examplesReadme.includes(value), `examples/README.md is missing fixture value: ${value}`)
+}
+
+for (const step of fixture.guidedFlow) {
+  const importantWords = step
+    .replaceAll('http://go.example.test/launch', '')
+    .replaceAll('https://example.com/waypoint-demo', '')
+    .replaceAll('go.example.test', '')
+    .replaceAll('qr.example.test', '')
+    .split(/\W+/)
+    .filter((word) => word.length > 6)
+
+  assert(
+    importantWords.some((word) => examplesReadme.toLowerCase().includes(word.toLowerCase())),
+    `examples/README.md appears to have drifted from guided flow step: ${step}`,
+  )
+}
 
 const serialized = `${fixtureText}\n${examplesReadme}`
 const forbiddenPatterns = [
