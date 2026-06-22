@@ -1,5 +1,7 @@
 # Waypoint
 
+[![CI](https://github.com/Martin123132/waypoint/actions/workflows/ci.yml/badge.svg)](https://github.com/Martin123132/waypoint/actions/workflows/ci.yml)
+
 Waypoint is a self-hosted dynamic QR code and short-link manager. Create a short URL, download a QR code, change the destination later, and keep basic scan analytics in a local SQLite database.
 
 ## Current MVP
@@ -140,6 +142,12 @@ npx playwright install chromium
 - Team accounts
 - UTM builder
 - Privacy controls for analytics retention
+
+## Project Docs
+
+- [Contributing](CONTRIBUTING.md)
+- [Security Policy](SECURITY.md)
+- [Project Status](PROJECT_STATUS.md)
 
 ## License
 

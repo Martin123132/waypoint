@@ -2,24 +2,29 @@ import { spawn } from 'node:child_process'
 import { mkdirSync } from 'node:fs'
 import { rm } from 'node:fs/promises'
 import net from 'node:net'
+import { tmpdir } from 'node:os'
 import { join } from 'node:path'
+
+const cacheRoot = process.platform === 'win32' ? 'D:\\CodexCache' : join(tmpdir(), 'waypoint-cache')
 
 process.env.PLAYWRIGHT_BROWSERS_PATH =
   process.env.WAYPOINT_PLAYWRIGHT_BROWSERS_PATH ??
   process.env.OPENQR_PLAYWRIGHT_BROWSERS_PATH ??
-  'D:\\CodexCache\\playwright'
+  join(cacheRoot, 'playwright')
 
 const { chromium } = await import('playwright')
 
 const projectRoot = new URL('..', import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, '$1')
-const testRoot = process.env.WAYPOINT_TEST_ROOT ?? process.env.OPENQR_TEST_ROOT ?? 'D:\\CodexCache\\waypoint\\tests'
-const tempRoot = process.env.WAYPOINT_TEMP_ROOT ?? process.env.OPENQR_TEMP_ROOT ?? 'D:\\CodexCache\\tmp'
+const testRoot = process.env.WAYPOINT_TEST_ROOT ?? process.env.OPENQR_TEST_ROOT ?? join(cacheRoot, 'waypoint', 'tests')
+const tempRoot = process.env.WAYPOINT_TEMP_ROOT ?? process.env.OPENQR_TEMP_ROOT ?? join(cacheRoot, 'tmp')
 const profileRoot =
   process.env.WAYPOINT_PLAYWRIGHT_PROFILE_ROOT ??
   process.env.OPENQR_PLAYWRIGHT_PROFILE_ROOT ??
-  'D:\\CodexCache\\playwright-profiles'
+  join(cacheRoot, 'playwright-profiles')
 const screenshotRoot =
-  process.env.WAYPOINT_SCREENSHOT_ROOT ?? process.env.OPENQR_SCREENSHOT_ROOT ?? 'D:\\CodexCache\\waypoint\\screenshots'
+  process.env.WAYPOINT_SCREENSHOT_ROOT ??
+  process.env.OPENQR_SCREENSHOT_ROOT ??
+  join(cacheRoot, 'waypoint', 'screenshots')
 
 mkdirSync(testRoot, { recursive: true })
 mkdirSync(tempRoot, { recursive: true })

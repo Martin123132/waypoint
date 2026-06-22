@@ -2,11 +2,13 @@ import { spawn } from 'node:child_process'
 import { mkdirSync } from 'node:fs'
 import http from 'node:http'
 import net from 'node:net'
+import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
+const cacheRoot = process.platform === 'win32' ? 'D:\\CodexCache' : join(tmpdir(), 'waypoint-cache')
 const projectRoot = new URL('..', import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, '$1')
-const testRoot = process.env.WAYPOINT_TEST_ROOT ?? process.env.OPENQR_TEST_ROOT ?? 'D:\\CodexCache\\waypoint\\tests'
-const tempRoot = process.env.WAYPOINT_TEMP_ROOT ?? process.env.OPENQR_TEMP_ROOT ?? 'D:\\CodexCache\\tmp'
+const testRoot = process.env.WAYPOINT_TEST_ROOT ?? process.env.OPENQR_TEST_ROOT ?? join(cacheRoot, 'waypoint', 'tests')
+const tempRoot = process.env.WAYPOINT_TEMP_ROOT ?? process.env.OPENQR_TEMP_ROOT ?? join(cacheRoot, 'tmp')
 
 mkdirSync(testRoot, { recursive: true })
 mkdirSync(tempRoot, { recursive: true })
