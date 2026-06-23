@@ -904,7 +904,7 @@ function Dashboard({ user, onLogout }: { user: AuthUser | null; onLogout: () => 
 
         <nav className="rail-nav" aria-label="Primary">
           <a
-            aria-current={activePanel === 'links'}
+            aria-current={activePanel === 'links' ? 'page' : undefined}
             className={activePanel === 'links' ? 'active' : ''}
             href="#links"
             onClick={() => jumpToPanel('#links')}
@@ -913,7 +913,7 @@ function Dashboard({ user, onLogout }: { user: AuthUser | null; onLogout: () => 
             Links
           </a>
           <a
-            aria-current={activePanel === 'domains'}
+            aria-current={activePanel === 'domains' ? 'page' : undefined}
             className={activePanel === 'domains' ? 'active' : ''}
             href="#domains"
             onClick={() => jumpToPanel('#domains')}
@@ -922,7 +922,7 @@ function Dashboard({ user, onLogout }: { user: AuthUser | null; onLogout: () => 
             Domains
           </a>
           <a
-            aria-current={activePanel === 'analytics'}
+            aria-current={activePanel === 'analytics' ? 'page' : undefined}
             className={activePanel === 'analytics' ? 'active' : ''}
             href="#analytics"
             onClick={() => jumpToPanel('#analytics')}
