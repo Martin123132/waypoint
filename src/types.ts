@@ -8,6 +8,7 @@ export type LinkSummary = {
   destination: string
   description: string
   active: boolean
+  trackScans: boolean
   qrForeground: string
   qrBackground: string
   createdAt: string
@@ -43,6 +44,7 @@ export type CreateLinkInput = {
   slug?: string
   domainId?: string | null
   description?: string
+  trackScans?: boolean
   qrForeground?: string
   qrBackground?: string
 }

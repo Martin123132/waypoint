@@ -16,6 +16,7 @@ Waypoint is a self-hosted dynamic QR code and short-link manager. Create a short
 - Custom branded domains with app fallback URLs
 - Campaign UTM builder for new and existing links
 - Link search and live/paused/branded/fallback filters
+- Per-link scan collection control
 - First-run admin setup
 - Password login with HttpOnly session cookie
 - Protected admin APIs with public redirects
@@ -123,11 +124,16 @@ The compose file stores SQLite data in the `waypoint-data` named volume and sets
 Upload a CSV from the dashboard's Bulk run panel. Supported columns:
 
 ```csv
-title,destination,slug,domain,description,active,qrForeground,qrBackground
-Launch page,https://example.com,launch,go.example.com,Campaign owner,true,#071318,#ffffff
+title,destination,slug,domain,description,active,trackScans,qrForeground,qrBackground
+Launch page,https://example.com,launch,go.example.com,Campaign owner,true,false,#071318,#ffffff
 ```
 
-Only `destination` is strictly required. If `title` is missing, Waypoint will derive one from the slug or URL. If `domain` is present, it must already exist in the Domains panel; invalid rows are skipped and reported without blocking the rest of the file. Imports are limited to 500 rows per file.
+Only `destination` is strictly required. If `title` is missing, Waypoint will derive one from the slug or URL. If `domain` is present, it must already exist in the Domains panel; invalid rows are skipped and reported without blocking the rest of the file. `active` defaults to `true`; `trackScans` defaults to `true` and can be set to `false` to disable analytics for that destination.
+Imports are limited to 500 rows per file.
+
+## Per-link analytics control
+
+You can disable scan capture per destination directly from create and detail views. Redirects keep working, QR codes continue to update, and scan records are not created while tracking is off.
 
 ## Verification
 
@@ -150,7 +156,7 @@ npx playwright install chromium
 
 - API keys
 - Team accounts
-- Privacy controls for analytics retention
+- Public audit and retention docs
 
 ## Project Docs
 

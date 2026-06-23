@@ -58,6 +58,7 @@ type LinkDraft = {
   domainId: string | null
   description: string
   active: boolean
+  trackScans: boolean
   qrForeground: string
   qrBackground: string
 }
@@ -70,6 +71,7 @@ const emptyCreateForm: CreateLinkInput = {
   slug: '',
   domainId: undefined,
   description: '',
+  trackScans: true,
   qrForeground: '#071318',
   qrBackground: '#ffffff',
 }
@@ -82,6 +84,7 @@ function toDraft(link: LinkSummary): LinkDraft {
     domainId: link.domainId,
     description: link.description,
     active: link.active,
+    trackScans: link.trackScans,
     qrForeground: link.qrForeground,
     qrBackground: link.qrBackground,
   }
@@ -449,6 +452,7 @@ function Dashboard({ user, onLogout }: { user: AuthUser | null; onLogout: () => 
       draft.domainId !== selected.domainId ||
       draft.description !== selected.description ||
       draft.active !== selected.active ||
+      draft.trackScans !== selected.trackScans ||
       draft.qrForeground !== selected.qrForeground ||
       draft.qrBackground !== selected.qrBackground
     )
@@ -565,7 +569,7 @@ function Dashboard({ user, onLogout }: { user: AuthUser | null; onLogout: () => 
     let active = true
 
     async function loadAnalytics() {
-      if (!selected?.id) {
+      if (!selected?.id || !selected.trackScans) {
         setAnalytics(null)
         return
       }
@@ -586,7 +590,7 @@ function Dashboard({ user, onLogout }: { user: AuthUser | null; onLogout: () => 
     return () => {
       active = false
     }
-  }, [selected?.id])
+  }, [selected?.id, selected?.trackScans])
 
   function flash(message: string) {
     setNotice(message)
@@ -603,6 +607,7 @@ function Dashboard({ user, onLogout }: { user: AuthUser | null; onLogout: () => 
         ...createForm,
         slug: createForm.slug?.trim() || undefined,
         description: createForm.description?.trim() || undefined,
+        trackScans: createForm.trackScans,
       })
       setCreateForm(emptyCreateForm)
       setUtmForm(emptyUtmForm)
@@ -741,6 +746,7 @@ function Dashboard({ user, onLogout }: { user: AuthUser | null; onLogout: () => 
         domainId: draft.domainId,
         description: draft.description,
         active: draft.active,
+        trackScans: draft.trackScans,
         qrForeground: draft.qrForeground,
         qrBackground: draft.qrBackground,
       })
@@ -1084,6 +1090,14 @@ function Dashboard({ user, onLogout }: { user: AuthUser | null; onLogout: () => 
                     placeholder="Campaign or owner"
                   />
                 </label>
+                <label className="switch-label">
+                  <input
+                    checked={createForm.trackScans}
+                    onChange={(event) => setCreateForm({ ...createForm, trackScans: event.target.checked })}
+                    type="checkbox"
+                  />
+                  Track scans
+                </label>
                 <div className="swatch-row">
                   <label>
                     Foreground
@@ -1146,7 +1160,7 @@ function Dashboard({ user, onLogout }: { user: AuthUser | null; onLogout: () => 
 
               <div className="csv-help">
                 <strong>CSV columns</strong>
-                <span>title, destination, slug, domain, description, active</span>
+                <span>title, destination, slug, domain, description, active, trackScans</span>
               </div>
 
               {importResult ? (
@@ -1316,6 +1330,9 @@ function Dashboard({ user, onLogout }: { user: AuthUser | null; onLogout: () => 
                     <span className={selected.active ? 'live-pill' : 'paused-pill'}>
                       {selected.active ? 'Live' : 'Paused'}
                     </span>
+                    <span className={selected.trackScans ? 'saved-pill' : 'paused-pill'}>
+                      {selected.trackScans ? 'Tracking scans' : 'Scans off'}
+                    </span>
                     <span className={draftDirty ? 'pending-pill' : 'saved-pill'}>
                       {draftDirty ? 'Unsaved edits' : 'Saved'}
                     </span>
@@ -1462,6 +1479,14 @@ function Dashboard({ user, onLogout }: { user: AuthUser | null; onLogout: () => 
                         />
                         Active redirect
                       </label>
+                      <label className="switch-label">
+                        <input
+                          checked={draft.trackScans}
+                          onChange={(event) => setDraft({ ...draft, trackScans: event.target.checked })}
+                          type="checkbox"
+                        />
+                        Track scans
+                      </label>
                       <div className="url-stack">
                         <span>{selected.shortUrl}</span>
                         {selected.domainHostname ? <small>{selected.fallbackUrl}</small> : null}
@@ -1512,7 +1537,7 @@ function Dashboard({ user, onLogout }: { user: AuthUser | null; onLogout: () => 
                     <div className="panel-heading compact">
                       <div>
                         <h3>30-day scans</h3>
-                        <p>{analytics?.daily.length ?? 0} active days</p>
+                        <p>{selected.trackScans ? `${analytics?.daily.length ?? 0} active days` : 'Tracking disabled'}</p>
                       </div>
                     </div>
                     <div className="bars" aria-label="30-day scan chart">
@@ -1531,7 +1556,7 @@ function Dashboard({ user, onLogout }: { user: AuthUser | null; onLogout: () => 
                     <div className="panel-heading compact">
                       <div>
                         <h3>Recent scans</h3>
-                        <p>{analytics?.events.length ?? 0} captured</p>
+                        <p>{selected.trackScans ? `${analytics?.events.length ?? 0} captured` : 'Tracking disabled'}</p>
                       </div>
                     </div>
                     <div className="event-table">

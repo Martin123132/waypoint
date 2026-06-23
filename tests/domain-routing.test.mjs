@@ -196,9 +196,34 @@ async function run() {
     assert(fallbackRedirect.status === 302, `Fallback redirect returned ${fallbackRedirect.status}`)
     assert(fallbackRedirect.headers.location === 'https://example.com/domain', `Fallback redirect target was ${fallbackRedirect.headers.location}`)
 
+    const trackOffResult = await api('/api/links', {
+      method: 'POST',
+      body: JSON.stringify({
+        title: 'No tracking',
+        destination: 'https://example.com/no-track',
+        slug: 'track-off',
+        trackScans: false,
+      }),
+    })
+    const trackOff = trackOffResult.payload
+    assert(trackOff.trackScans === false, 'trackScans false should be preserved in the created link')
+
+    const trackOffRedirect = await rawGet(port, '/r/track-off', `127.0.0.1:${port}`)
+    assert(trackOffRedirect.status === 302, `Track-disabled redirect returned ${trackOffRedirect.status}`)
+    assert(trackOffRedirect.headers.location === 'https://example.com/no-track', `Track-disabled redirect target was ${trackOffRedirect.headers.location}`)
+
+    const trackOffEvents = await api(`/api/links/${trackOff.id}/events`)
+    assert(Array.isArray(trackOffEvents.payload.events), 'Track-disabled events response must contain an events array')
+    assert(trackOffEvents.payload.events.length === 0, 'Track-disabled link should not create scan events')
+    assert(
+      Array.isArray(trackOffEvents.payload.daily) && trackOffEvents.payload.daily.length === 0,
+      'Track-disabled link should not create daily scan buckets',
+    )
+
     const csv = await api('/api/export/links.csv')
     assert(String(csv.payload).includes(`brand.localhost:${port}`), 'CSV export did not include the domain hostname')
     assert(String(csv.payload).includes(`http://brand.localhost:${port}/domain-link`), 'CSV export did not include the branded URL')
+    assert(String(csv.payload).includes('trackScans'), 'CSV export did not include the trackScans column')
 
     await api('/api/auth/logout', { method: 'POST' })
     assert(

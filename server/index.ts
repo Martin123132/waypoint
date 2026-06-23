@@ -48,6 +48,7 @@ db.exec(`
     destination TEXT NOT NULL,
     description TEXT,
     active INTEGER NOT NULL DEFAULT 1,
+    trackScans INTEGER NOT NULL DEFAULT 1,
     qrForeground TEXT NOT NULL DEFAULT '#071318',
     qrBackground TEXT NOT NULL DEFAULT '#ffffff',
     createdAt TEXT NOT NULL,
@@ -96,6 +97,13 @@ try {
     throw error
   }
 }
+try {
+  db.exec('ALTER TABLE links ADD COLUMN trackScans INTEGER NOT NULL DEFAULT 1')
+} catch (error) {
+  if (!(error instanceof Error) || !error.message.includes('duplicate column name')) {
+    throw error
+  }
+}
 
 const app = Fastify({
   logger: {
@@ -118,6 +126,7 @@ const createLinkSchema = z.object({
   slug: z.string().trim().max(64).optional(),
   domainId: z.string().trim().max(80).nullable().optional(),
   description: z.string().trim().max(240).optional(),
+  trackScans: z.boolean().optional(),
   qrForeground: hexColor.optional(),
   qrBackground: hexColor.optional(),
 })
@@ -133,6 +142,7 @@ const csvImportRowSchema = z.object({
   domainId: z.string().trim().max(80).nullable().optional(),
   description: z.string().trim().max(240).optional(),
   active: z.boolean().optional(),
+  trackScans: z.boolean().optional(),
   qrForeground: hexColor.optional(),
   qrBackground: hexColor.optional(),
 })
@@ -158,6 +168,7 @@ type LinkRow = {
   destination: string
   description: string | null
   active: number
+  trackScans: number | null
   qrForeground: string
   qrBackground: string
   createdAt: string
@@ -330,6 +341,7 @@ function toSummary(row: LinkSummaryRow, origin: string) {
     destination: row.destination,
     description: row.description ?? '',
     active: row.active === 1,
+    trackScans: (row.trackScans ?? 1) === 1,
     qrForeground: row.qrForeground,
     qrBackground: row.qrBackground,
     createdAt: row.createdAt,
@@ -350,8 +362,8 @@ function insertLink(input: z.infer<typeof csvImportRowSchema>) {
 
   db.prepare(
     `INSERT INTO links
-      (id, domainId, slug, title, destination, description, active, qrForeground, qrBackground, createdAt, updatedAt)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      (id, domainId, slug, title, destination, description, active, trackScans, qrForeground, qrBackground, createdAt, updatedAt)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
   ).run(
     id,
     domainId,
@@ -360,6 +372,7 @@ function insertLink(input: z.infer<typeof csvImportRowSchema>) {
     input.destination,
     input.description ?? null,
     input.active === undefined || input.active ? 1 : 0,
+    input.trackScans === undefined || input.trackScans ? 1 : 0,
     input.qrForeground ?? '#071318',
     input.qrBackground ?? '#ffffff',
     createdAt,
@@ -484,6 +497,11 @@ function classifyBrowser(userAgent: string) {
 }
 
 function recordEvent(request: FastifyRequest, linkId: string) {
+  const link = getLinkById(linkId)
+  if (!link || link.trackScans === 0) {
+    return
+  }
+
   const userAgent = headerValue(request.headers['user-agent']) ?? ''
   const referrer = headerValue(request.headers.referer) ?? null
 
@@ -546,13 +564,25 @@ function normalizeImportRow(row: Record<string, unknown>) {
     domainId: rawHostname ? (domain?.id ?? '__unknown_domain__') : undefined,
     description: rowValue(row, 'description', 'note', 'notes'),
     active: parseBoolean(rowValue(row, 'active', 'status')),
+    trackScans: parseBoolean(rowValue(row, 'trackScans', 'track_scans', 'track')),
     qrForeground: rowValue(row, 'qrForeground', 'qr_foreground', 'foreground'),
     qrBackground: rowValue(row, 'qrBackground', 'qr_background', 'background'),
   }
 }
 
 function csvRowsFromLinks(rows: Array<LinkRow & { scans?: number; domainHostname?: string | null }>, origin: string) {
-  const header = ['slug', 'title', 'destination', 'domain', 'shortUrl', 'active', 'scans', 'createdAt', 'updatedAt']
+  const header = [
+    'slug',
+    'title',
+    'destination',
+    'domain',
+    'shortUrl',
+    'active',
+    'trackScans',
+    'scans',
+    'createdAt',
+    'updatedAt',
+  ]
   const body = rows.map((row) =>
     [
       row.slug,
@@ -561,6 +591,7 @@ function csvRowsFromLinks(rows: Array<LinkRow & { scans?: number; domainHostname
       row.domainHostname ?? '',
       shortUrlForRow(row, origin),
       row.active === 1 ? 'true' : 'false',
+      (row.trackScans ?? 1) === 1 ? 'true' : 'false',
       row.scans ?? '',
       row.createdAt,
       row.updatedAt,
@@ -1046,6 +1077,7 @@ app.patch<{ Params: { id: string } }>('/api/links/:id', async (request, reply) =
          destination = ?,
          description = ?,
          active = ?,
+         trackScans = ?,
          qrForeground = ?,
          qrBackground = ?,
          updatedAt = ?
@@ -1057,6 +1089,7 @@ app.patch<{ Params: { id: string } }>('/api/links/:id', async (request, reply) =
     update.destination ?? link.destination,
     update.description ?? link.description,
     update.active === undefined ? link.active : update.active ? 1 : 0,
+    update.trackScans === undefined ? link.trackScans ?? 1 : update.trackScans ? 1 : 0,
     update.qrForeground ?? link.qrForeground,
     update.qrBackground ?? link.qrBackground,
     updatedAt,
