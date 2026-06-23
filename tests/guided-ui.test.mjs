@@ -189,6 +189,14 @@ async function run() {
     await detailPanel.getByText('Unsaved edits').waitFor({ timeout: 10000 })
     await detailPanel.getByRole('button', { name: 'Save changes' }).click()
     await detailPanel.getByText('Saved').waitFor({ timeout: 10000 })
+    await page.getByRole('textbox', { name: 'Search links' }).fill('retargeting')
+    await page.getByText('1 of 1 records').waitFor({ timeout: 10000 })
+    await page.locator('.link-row').getByText('Guided Path').waitFor({ timeout: 10000 })
+    await page.getByRole('textbox', { name: 'Search links' }).fill('missing-link')
+    await page.getByText('No links match this view.').waitFor({ timeout: 10000 })
+    await page.getByRole('textbox', { name: 'Search links' }).fill('')
+    await page.getByRole('button', { name: 'Fallback' }).click()
+    await page.getByText('1 of 1 records').waitFor({ timeout: 10000 })
     await detailPanel.getByRole('button', { name: 'Delete' }).click()
     await detailPanel.getByRole('button', { name: 'Confirm delete' }).waitFor({ timeout: 10000 })
     await detailPanel
@@ -209,6 +217,8 @@ async function run() {
     await page.getByText('Step 4 of 4 - 3 complete').waitFor({ timeout: 10000 })
     await page.getByText('Copy the live path now; scans will turn the last step on.').waitFor({ timeout: 10000 })
     await page.locator(`text=${host}/${slug}`).first().waitFor({ timeout: 10000 })
+    await page.getByRole('button', { name: 'Branded' }).click()
+    await page.getByText('1 of 1 records').waitFor({ timeout: 10000 })
 
     await page.locator('.next-move').getByRole('button', { name: 'Copy link' }).click()
     await page.waitForTimeout(500)

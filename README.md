@@ -15,6 +15,7 @@ Waypoint is a self-hosted dynamic QR code and short-link manager. Create a short
 - Bulk QR ZIP export with SVG files and a CSV manifest
 - Custom branded domains with app fallback URLs
 - Campaign UTM builder for new and existing links
+- Link search and live/paused/branded/fallback filters
 - First-run admin setup
 - Password login with HttpOnly session cookie
 - Protected admin APIs with public redirects

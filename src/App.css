@@ -682,6 +682,55 @@ button:disabled {
   gap: 8px;
 }
 
+.link-tools {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.search-field {
+  position: relative;
+  display: block;
+}
+
+.search-field svg {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  color: #647286;
+  transform: translateY(-50%);
+}
+
+.search-field input {
+  padding-left: 38px;
+}
+
+.filter-pills {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.filter-pill {
+  min-height: 32px;
+  padding: 0 10px;
+  border: 1px solid #ccd6e2;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #3b4758;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 850;
+  cursor: pointer;
+}
+
+.filter-pill.active,
+.filter-pill:hover {
+  border-color: rgba(31, 191, 154, 0.48);
+  background: #eefdf9;
+  color: #0d1824;
+}
+
 .bulk-actions {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;

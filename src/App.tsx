@@ -18,6 +18,7 @@ import {
   RefreshCw,
   Route,
   Save,
+  Search,
   ShieldCheck,
   Trash2,
 } from 'lucide-react'
@@ -60,6 +61,8 @@ type LinkDraft = {
   qrForeground: string
   qrBackground: string
 }
+
+type LinkFilter = 'all' | 'live' | 'paused' | 'branded' | 'fallback'
 
 const emptyCreateForm: CreateLinkInput = {
   title: '',
@@ -302,6 +305,8 @@ function Dashboard({ user, onLogout }: { user: AuthUser | null; onLogout: () => 
   const [links, setLinks] = useState<LinkSummary[]>([])
   const [domains, setDomains] = useState<DomainSummary[]>([])
   const [selectedId, setSelectedId] = useState('')
+  const [linkSearch, setLinkSearch] = useState('')
+  const [linkFilter, setLinkFilter] = useState<LinkFilter>('all')
   const [createForm, setCreateForm] = useState<CreateLinkInput>(emptyCreateForm)
   const [utmForm, setUtmForm] = useState<UtmDraft>(emptyUtmForm)
   const [domainForm, setDomainForm] = useState(emptyDomainForm)
@@ -330,6 +335,40 @@ function Dashboard({ user, onLogout }: { user: AuthUser | null; onLogout: () => 
     }),
     [links],
   )
+
+  const filteredLinks = useMemo(() => {
+    const query = linkSearch.trim().toLowerCase()
+
+    return links.filter((link) => {
+      const matchesFilter =
+        linkFilter === 'all' ||
+        (linkFilter === 'live' && link.active) ||
+        (linkFilter === 'paused' && !link.active) ||
+        (linkFilter === 'branded' && Boolean(link.domainHostname)) ||
+        (linkFilter === 'fallback' && !link.domainHostname)
+
+      if (!matchesFilter) {
+        return false
+      }
+
+      if (!query) {
+        return true
+      }
+
+      return [link.title, link.slug, link.destination, link.description, link.domainHostname ?? '', link.domainLabel ?? '']
+        .join(' ')
+        .toLowerCase()
+        .includes(query)
+    })
+  }, [linkFilter, linkSearch, links])
+
+  const linkFilters: Array<{ key: LinkFilter; label: string }> = [
+    { key: 'all', label: 'All' },
+    { key: 'live', label: 'Live' },
+    { key: 'paused', label: 'Paused' },
+    { key: 'branded', label: 'Branded' },
+    { key: 'fallback', label: 'Fallback' },
+  ]
 
   const maxDailyScans = useMemo(() => {
     return Math.max(1, ...(analytics?.daily.map((day) => day.scans) ?? [0]))
@@ -1199,13 +1238,46 @@ function Dashboard({ user, onLogout }: { user: AuthUser | null; onLogout: () => 
               <div className="panel-heading">
                 <div>
                   <h2>Links</h2>
-                  <p>{loading ? 'Loading records' : `${links.length} records`}</p>
+                  <p>
+                    {loading
+                      ? 'Loading records'
+                      : linkSearch || linkFilter !== 'all'
+                        ? `${filteredLinks.length} of ${links.length} records`
+                        : `${links.length} records`}
+                  </p>
+                </div>
+              </div>
+
+              <div className="link-tools" aria-label="Link list tools">
+                <label className="search-field">
+                  <Search size={16} />
+                  <input
+                    aria-label="Search links"
+                    value={linkSearch}
+                    onChange={(event) => setLinkSearch(event.target.value)}
+                    placeholder="Search title, slug, domain, URL"
+                  />
+                </label>
+                <div className="filter-pills" aria-label="Filter links">
+                  {linkFilters.map((filter) => (
+                    <button
+                      className={linkFilter === filter.key ? 'filter-pill active' : 'filter-pill'}
+                      key={filter.key}
+                      onClick={() => setLinkFilter(filter.key)}
+                      type="button"
+                    >
+                      {filter.label}
+                    </button>
+                  ))}
                 </div>
               </div>
 
               <div className="link-rows">
                 {links.length === 0 && !loading ? <div className="empty-state">No links yet.</div> : null}
-                {links.map((link) => (
+                {links.length > 0 && filteredLinks.length === 0 ? (
+                  <div className="empty-state">No links match this view.</div>
+                ) : null}
+                {filteredLinks.map((link) => (
                   <button
                     key={link.id}
                     className={`link-row ${selected?.id === link.id ? 'selected' : ''}`}
