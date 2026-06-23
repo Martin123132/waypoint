@@ -308,6 +308,7 @@ function Dashboard({ user, onLogout }: { user: AuthUser | null; onLogout: () => 
   const [links, setLinks] = useState<LinkSummary[]>([])
   const [domains, setDomains] = useState<DomainSummary[]>([])
   const [selectedId, setSelectedId] = useState('')
+  const [activePanel, setActivePanel] = useState<'links' | 'domains' | 'analytics'>('links')
   const [linkSearch, setLinkSearch] = useState('')
   const [linkFilter, setLinkFilter] = useState<LinkFilter>('all')
   const [createForm, setCreateForm] = useState<CreateLinkInput>(emptyCreateForm)
@@ -558,11 +559,53 @@ function Dashboard({ user, onLogout }: { user: AuthUser | null; onLogout: () => 
     setDomains(await listDomains())
   }
 
+  function setPanelFromHash(hash: string) {
+    if (hash === '#domains') {
+      setActivePanel('domains')
+      return
+    }
+
+    if (hash === '#analytics') {
+      setActivePanel('analytics')
+      return
+    }
+
+    if (hash === '#links') {
+      setActivePanel('links')
+      return
+    }
+
+    if (hash === '#create') {
+      setActivePanel('links')
+      return
+    }
+  }
+
+  function jumpToPanel(hash: string) {
+    setPanelFromHash(hash)
+    if (hash) {
+      window.location.hash = hash
+    }
+  }
+
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     void refreshLinks()
     void refreshDomains()
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  useEffect(() => {
+    const handleHash = () => {
+      setPanelFromHash(window.location.hash)
+    }
+
+    window.addEventListener('hashchange', handleHash)
+    handleHash()
+
+    return () => {
+      window.removeEventListener('hashchange', handleHash)
+    }
   }, [])
 
   useEffect(() => {
@@ -860,15 +903,30 @@ function Dashboard({ user, onLogout }: { user: AuthUser | null; onLogout: () => 
         </a>
 
         <nav className="rail-nav" aria-label="Primary">
-          <a className="active" href="#links">
+          <a
+            aria-current={activePanel === 'links'}
+            className={activePanel === 'links' ? 'active' : ''}
+            href="#links"
+            onClick={() => jumpToPanel('#links')}
+          >
             <LinkIcon size={18} />
             Links
           </a>
-          <a href="#domains">
+          <a
+            aria-current={activePanel === 'domains'}
+            className={activePanel === 'domains' ? 'active' : ''}
+            href="#domains"
+            onClick={() => jumpToPanel('#domains')}
+          >
             <Globe2 size={18} />
             Domains
           </a>
-          <a href="#analytics">
+          <a
+            aria-current={activePanel === 'analytics'}
+            className={activePanel === 'analytics' ? 'active' : ''}
+            href="#analytics"
+            onClick={() => jumpToPanel('#analytics')}
+          >
             <BarChart3 size={18} />
             Analytics
           </a>
