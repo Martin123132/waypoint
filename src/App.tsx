@@ -38,6 +38,7 @@ import {
   updateDomain,
   updateLink,
 } from './api'
+import { destinationWithUtm, emptyUtmForm, type UtmDraft } from './utm'
 import type {
   AuthInput,
   AuthStatus,
@@ -60,12 +61,6 @@ type LinkDraft = {
   qrBackground: string
 }
 
-type UtmDraft = {
-  source: string
-  medium: string
-  campaign: string
-}
-
 const emptyCreateForm: CreateLinkInput = {
   title: '',
   destination: '',
@@ -74,12 +69,6 @@ const emptyCreateForm: CreateLinkInput = {
   description: '',
   qrForeground: '#071318',
   qrBackground: '#ffffff',
-}
-
-const emptyUtmForm: UtmDraft = {
-  source: '',
-  medium: '',
-  campaign: '',
 }
 
 function toDraft(link: LinkSummary): LinkDraft {
@@ -136,24 +125,6 @@ function isHttpUrl(value: string) {
   } catch {
     return false
   }
-}
-
-function destinationWithUtm(destination: string, utm: UtmDraft) {
-  const url = new URL(destination)
-  const fields = {
-    utm_source: utm.source,
-    utm_medium: utm.medium,
-    utm_campaign: utm.campaign,
-  }
-
-  for (const [key, value] of Object.entries(fields)) {
-    const trimmed = value.trim()
-    if (trimmed) {
-      url.searchParams.set(key, trimmed)
-    }
-  }
-
-  return url.toString()
 }
 
 function MetricCard({

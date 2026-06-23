@@ -15,6 +15,7 @@ const checkedFiles = [
   'tests/domain-routing.test.mjs',
   'tests/guided-ui.test.mjs',
   'tests/public-readiness.test.mjs',
+  'tests/utm.test.ts',
   'scripts/generate-release-review-outcome.mjs',
   'scripts/with-d-drive-cache.mjs',
 ]

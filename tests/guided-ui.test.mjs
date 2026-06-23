@@ -144,7 +144,7 @@ async function run() {
     const expectedUrl = `http://${host}/${slug}`
 
     await page.goto(baseUrl, { waitUntil: 'networkidle' })
-    await page.getByRole('heading', { name: 'Waypoint links' }).waitFor({ timeout: 10000 })
+    await page.getByText('Waypoint links').waitFor({ timeout: 10000 })
     await page.getByText('Build first code').waitFor({ timeout: 10000 })
     await page.getByText('Step 1 of 4 - 0 complete').waitFor({ timeout: 10000 })
     await page.getByText('Start anywhere later; this gets the board alive fastest.').waitFor({ timeout: 10000 })
