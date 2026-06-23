@@ -1,4 +1,4 @@
-import { type FormEvent, type ReactNode, useEffect, useMemo, useState } from 'react'
+import { type FormEvent, type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   ArrowRight,
   BarChart3,
@@ -325,6 +325,9 @@ function Dashboard({ user, onLogout }: { user: AuthUser | null; onLogout: () => 
   const [error, setError] = useState('')
   const [copyFallback, setCopyFallback] = useState<{ linkId: string; url: string } | null>(null)
   const [deleteConfirmId, setDeleteConfirmId] = useState('')
+  const createTitleRef = useRef<HTMLInputElement | null>(null)
+  const searchInputRef = useRef<HTMLInputElement | null>(null)
+  const domainHostnameRef = useRef<HTMLInputElement | null>(null)
 
   const selected = useMemo(
     () => links.find((link) => link.id === selectedId) ?? links[0],
@@ -559,7 +562,7 @@ function Dashboard({ user, onLogout }: { user: AuthUser | null; onLogout: () => 
     setDomains(await listDomains())
   }
 
-  function setPanelFromHash(hash: string) {
+  const setPanelFromHash = useCallback((hash: string) => {
     if (hash === '#domains') {
       setActivePanel('domains')
       return
@@ -579,14 +582,14 @@ function Dashboard({ user, onLogout }: { user: AuthUser | null; onLogout: () => 
       setActivePanel('links')
       return
     }
-  }
+  }, [])
 
-  function jumpToPanel(hash: string) {
+  const jumpToPanel = useCallback((hash: string) => {
     setPanelFromHash(hash)
     if (hash) {
       window.location.hash = hash
     }
-  }
+  }, [setPanelFromHash])
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -606,7 +609,47 @@ function Dashboard({ user, onLogout }: { user: AuthUser | null; onLogout: () => 
     return () => {
       window.removeEventListener('hashchange', handleHash)
     }
-  }, [])
+  }, [setPanelFromHash])
+
+  useEffect(() => {
+    function handleShortcut(event: KeyboardEvent) {
+      if (event.defaultPrevented || event.ctrlKey || event.metaKey || event.altKey) {
+        return
+      }
+
+      const activeElement = document.activeElement as HTMLElement | null
+      const isTypingContext = activeElement?.tagName.toLowerCase() === 'textarea' || activeElement?.isContentEditable === true
+      if (isTypingContext) {
+        return
+      }
+
+      const key = event.key.toLowerCase()
+      if (key === 'n') {
+        event.preventDefault()
+        jumpToPanel('#create')
+        requestAnimationFrame(() => createTitleRef.current?.focus())
+        return
+      }
+
+      if (key === '/') {
+        event.preventDefault()
+        jumpToPanel('#links')
+        requestAnimationFrame(() => searchInputRef.current?.focus())
+        return
+      }
+
+      if (key === 'd') {
+        event.preventDefault()
+        jumpToPanel('#domains')
+        requestAnimationFrame(() => domainHostnameRef.current?.focus())
+      }
+    }
+
+    window.addEventListener('keydown', handleShortcut)
+    return () => {
+      window.removeEventListener('keydown', handleShortcut)
+    }
+  }, [jumpToPanel])
 
   useEffect(() => {
     let active = true
@@ -1000,6 +1043,7 @@ function Dashboard({ user, onLogout }: { user: AuthUser | null; onLogout: () => 
             <strong>{nextMove.title}</strong>
             <span>{nextMove.detail}</span>
             <em>{nextMove.reason}</em>
+            <em>Shortcut: N = New, / = Search, D = Domains</em>
             <div className="move-progress" aria-label={`Launch progress ${launchProgress}%`}>
               <span style={{ width: `${launchProgress}%` }} />
             </div>
@@ -1057,6 +1101,7 @@ function Dashboard({ user, onLogout }: { user: AuthUser | null; onLogout: () => 
                 <label>
                   Title
                   <input
+                    ref={createTitleRef}
                     value={createForm.title}
                     onChange={(event) => setCreateForm({ ...createForm, title: event.target.value })}
                     placeholder="Launch page"
@@ -1247,6 +1292,7 @@ function Dashboard({ user, onLogout }: { user: AuthUser | null; onLogout: () => 
                 <label>
                   Hostname
                   <input
+                    ref={domainHostnameRef}
                     value={domainForm.hostname}
                     onChange={(event) => setDomainForm({ ...domainForm, hostname: event.target.value })}
                     placeholder="go.example.com"
@@ -1324,6 +1370,7 @@ function Dashboard({ user, onLogout }: { user: AuthUser | null; onLogout: () => 
                 <label className="search-field">
                   <Search size={16} />
                   <input
+                    ref={searchInputRef}
                     aria-label="Search links"
                     value={linkSearch}
                     onChange={(event) => setLinkSearch(event.target.value)}

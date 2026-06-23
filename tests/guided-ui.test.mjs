@@ -148,6 +148,31 @@ async function run() {
     await page.getByText('Build first code').waitFor({ timeout: 10000 })
     await page.getByText('Step 1 of 4 - 0 complete').waitFor({ timeout: 10000 })
     await page.getByText('Start anywhere later; this gets the board alive fastest.').waitFor({ timeout: 10000 })
+    await page.getByText('Shortcut: N = New, / = Search, D = Domains').waitFor({ timeout: 10000 })
+
+    await page.keyboard.press('d')
+    const domainHostnameField = page.getByRole('textbox', { name: 'Hostname' })
+    await domainHostnameField.waitFor({ state: 'visible', timeout: 10000 })
+    assert(
+      await domainHostnameField.evaluate((node) => node === document.activeElement),
+      'D shortcut did not focus the domain hostname field',
+    )
+
+    await page.keyboard.press('/')
+    const searchField = page.getByRole('textbox', { name: 'Search links' })
+    await searchField.waitFor({ state: 'visible', timeout: 10000 })
+    assert(
+      await searchField.evaluate((node) => node === document.activeElement),
+      'Slash shortcut did not focus the search field',
+    )
+
+    await page.keyboard.press('n')
+    const createTitleField = page.getByRole('textbox', { name: 'Title' })
+    await createTitleField.waitFor({ state: 'visible', timeout: 10000 })
+    assert(
+      await createTitleField.evaluate((node) => node === document.activeElement),
+      'N shortcut did not focus create title',
+    )
 
     const createPanel = page.locator('.create-panel')
     await createPanel.getByText('Paste a full https:// destination').waitFor({ timeout: 10000 })
