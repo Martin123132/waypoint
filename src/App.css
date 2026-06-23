@@ -285,6 +285,71 @@
   margin-bottom: 18px;
 }
 
+.mission-chips {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.mission-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  min-height: 46px;
+  border: 1px solid #d8e0ea;
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: 0 10px 20px rgba(31, 45, 61, 0.06);
+  color: #102033;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.mission-chip svg {
+  color: #0ea5a4;
+  flex: 0 0 auto;
+}
+
+.mission-chip:disabled {
+  opacity: 0.56;
+  color: #97a6b7;
+  cursor: not-allowed;
+}
+
+.mission-chip:disabled svg {
+  color: #97a6b7;
+}
+
+.starter-tip {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+  padding: 12px 14px;
+  border: 1px solid #a7f3d0;
+  border-radius: 8px;
+  background: #ecfdf5;
+  color: #065f46;
+}
+
+.starter-tip p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.35;
+  font-weight: 750;
+}
+
+.starter-tip strong {
+  font-weight: 900;
+}
+
+.starter-tip .secondary-button {
+  flex: 0 0 auto;
+}
+
 .guide-step {
   display: flex;
   align-items: center;
@@ -1338,5 +1403,13 @@ button:disabled {
 
   .mission-rail {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .mission-chips {
+    grid-template-columns: 1fr;
+  }
+
+  .starter-tip {
+    flex-direction: column;
   }
 }

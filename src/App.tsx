@@ -325,6 +325,13 @@ function Dashboard({ user, onLogout }: { user: AuthUser | null; onLogout: () => 
   const [error, setError] = useState('')
   const [copyFallback, setCopyFallback] = useState<{ linkId: string; url: string } | null>(null)
   const [deleteConfirmId, setDeleteConfirmId] = useState('')
+  const [showStarterTip, setShowStarterTip] = useState(() => {
+    try {
+      return !sessionStorage.getItem('waypoint_starter_tip_seen')
+    } catch {
+      return true
+    }
+  })
   const createTitleRef = useRef<HTMLInputElement | null>(null)
   const searchInputRef = useRef<HTMLInputElement | null>(null)
   const domainHostnameRef = useRef<HTMLInputElement | null>(null)
@@ -515,6 +522,7 @@ function Dashboard({ user, onLogout }: { user: AuthUser | null; onLogout: () => 
     }
   }, [domains.length, links.length, primaryDomain, selected, totals.scans])
   const activeCopyFallback = copyFallback?.linkId === selected?.id ? copyFallback : null
+  const canShareSelected = Boolean(selected)
 
   function selectedDomainIdForCreate() {
     if (createForm.domainId === null) {
@@ -932,6 +940,34 @@ function Dashboard({ user, onLogout }: { user: AuthUser | null; onLogout: () => 
     }
   }
 
+  function dismissStarterTip() {
+    setShowStarterTip(false)
+    try {
+      sessionStorage.setItem('waypoint_starter_tip_seen', '1')
+    } catch {
+      // Optional storage; still safe to continue if unavailable.
+    }
+  }
+
+  function jumpToCreate() {
+    jumpToPanel('#create')
+    requestAnimationFrame(() => createTitleRef.current?.focus())
+  }
+
+  function jumpToDomains() {
+    jumpToPanel('#domains')
+    requestAnimationFrame(() => domainHostnameRef.current?.focus())
+  }
+
+  async function shareFromMission() {
+    if (!selected) {
+      jumpToPanel('#links')
+      return
+    }
+
+    await copyShortUrl()
+  }
+
   return (
     <div className="app-shell">
       <aside className="side-rail">
@@ -1015,6 +1051,33 @@ function Dashboard({ user, onLogout }: { user: AuthUser | null; onLogout: () => 
         </header>
 
         {error ? <div className="error-banner">{error}</div> : null}
+
+        {showStarterTip ? (
+          <section className="starter-tip" aria-label="Welcome tip">
+            <p>
+              Try <strong>N = New</strong>, <strong>/ = Search</strong>, <strong>D = Domains</strong>.
+              Use these shortcuts to jump around quickly.
+            </p>
+            <button className="secondary-button" onClick={dismissStarterTip} type="button">
+              Got it
+            </button>
+          </section>
+        ) : null}
+
+        <section className="mission-chips" aria-label="Mission actions">
+          <button className="mission-chip" onClick={jumpToCreate} type="button">
+            <Plus size={16} />
+            <span>{links.length === 0 ? 'Create first code' : 'Create a code'}</span>
+          </button>
+          <button className="mission-chip" onClick={jumpToDomains} type="button">
+            <Globe2 size={16} />
+            <span>Add brand domain</span>
+          </button>
+          <button className="mission-chip" disabled={!canShareSelected} onClick={() => void shareFromMission()} type="button">
+            <Copy size={16} />
+            <span>Share link</span>
+          </button>
+        </section>
 
         <section className="guide-strip" aria-label="Launch path">
           {guideSteps.map((step) => (

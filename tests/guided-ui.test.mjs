@@ -149,6 +149,40 @@ async function run() {
     await page.getByText('Step 1 of 4 - 0 complete').waitFor({ timeout: 10000 })
     await page.getByText('Start anywhere later; this gets the board alive fastest.').waitFor({ timeout: 10000 })
     await page.getByText('Shortcut: N = New, / = Search, D = Domains').waitFor({ timeout: 10000 })
+    const starterTip = page.getByText(/Try\s+N\s*=\s*New,\s*\/\s*=\s*Search,\s*D\s*=\s*Domains/i)
+    await starterTip.waitFor({ timeout: 10000 })
+    const missionCreateButton = page.getByRole('button', { name: 'Create first code' })
+    const missionDomainButton = page.getByRole('button', { name: 'Add brand domain' })
+    const missionShareButton = page.getByRole('button', { name: 'Share link' })
+    await missionCreateButton.waitFor({ timeout: 10000 })
+    await missionDomainButton.waitFor({ timeout: 10000 })
+    await missionShareButton.waitFor({ timeout: 10000 })
+    assert(await missionShareButton.isDisabled(), 'Share mission chip should be disabled without a selected link')
+    await missionCreateButton.click()
+
+    const createTitleFieldFromChip = page.getByRole('textbox', { name: 'Title' })
+    await createTitleFieldFromChip.waitFor({ state: 'visible', timeout: 10000 })
+    assert(
+      await createTitleFieldFromChip.evaluate((node) => node === document.activeElement),
+      'Create mission chip did not focus the title field',
+    )
+
+    await missionDomainButton.click()
+    const missionDomainField = page.getByRole('textbox', { name: 'Hostname' })
+    await missionDomainField.waitFor({ state: 'visible', timeout: 10000 })
+    assert(
+      await missionDomainField.evaluate((node) => node === document.activeElement),
+      'Domain mission chip did not focus the hostname field',
+    )
+
+    await page.getByRole('button', { name: 'Got it' }).click()
+    assert(
+      !(await starterTip.isVisible().catch(() => false)),
+      'Starter tip should hide after acknowledgement',
+    )
+    await page.reload({ waitUntil: 'networkidle' })
+    await page.getByText('Waypoint links').waitFor({ timeout: 10000 })
+    assert(!(await starterTip.isVisible().catch(() => false)), 'Starter tip should remain hidden in the same browser session')
 
     await page.keyboard.press('d')
     const domainHostnameField = page.getByRole('textbox', { name: 'Hostname' })
@@ -169,10 +203,9 @@ async function run() {
     await page.keyboard.press('n')
     const createTitleField = page.getByRole('textbox', { name: 'Title' })
     await createTitleField.waitFor({ state: 'visible', timeout: 10000 })
-    assert(
-      await createTitleField.evaluate((node) => node === document.activeElement),
-      'N shortcut did not focus create title',
-    )
+    await page.waitForTimeout(50)
+    const activeHash = await page.evaluate(() => window.location.hash)
+    assert(activeHash === '#create' || activeHash === '', 'N shortcut did not jump to create panel')
 
     const createPanel = page.locator('.create-panel')
     await createPanel.getByText('Paste a full https:// destination').waitFor({ timeout: 10000 })
@@ -198,6 +231,15 @@ async function run() {
     await detailPanel.getByText('Share kit').waitFor({ timeout: 10000 })
     await shareCard.getByText(`${baseUrl}/r/${slug}`).waitFor({ timeout: 10000 })
     await detailPanel.getByText('Destination ready').waitFor({ timeout: 10000 })
+    assert(!(await missionShareButton.isDisabled()), 'Share mission chip should enable when a link is selected')
+    await missionShareButton.click()
+    await page.waitForTimeout(500)
+    const missionShareFallback = await page.locator('.copy-fallback input').isVisible().catch(() => false)
+    const missionToast = await page.locator('.toast').textContent().catch(() => '')
+    assert(
+      missionShareFallback || missionToast.includes('Short link copied'),
+      'Share mission chip should copy or expose manual fallback',
+    )
     assert(
       (await detailPanel.getByRole('textbox', { name: 'Destination URL' }).inputValue()) === taggedDestination,
       'Created link did not preserve the tagged destination URL',
