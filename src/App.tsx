@@ -65,6 +65,7 @@ type LinkDraft = {
 }
 
 type LinkFilter = 'all' | 'live' | 'paused' | 'branded' | 'fallback'
+type ActionKey = 'new' | 'search' | 'brand-domain' | 'apply-brand' | 'copy' | 'analytics'
 
 const emptyCreateForm: CreateLinkInput = {
   title: '',
@@ -526,6 +527,25 @@ function Dashboard({ user, onLogout }: { user: AuthUser | null; onLogout: () => 
   const activeCopyFallback = copyFallback?.linkId === selected?.id ? copyFallback : null
   const canShareSelected = Boolean(selected)
   const hasActiveFilters = Boolean(linkSearch.trim()) || linkFilter !== 'all'
+  const recommendedAction = useMemo<ActionKey>(() => {
+    if (links.length === 0) {
+      return 'new'
+    }
+
+    if (domains.length === 0) {
+      return 'brand-domain'
+    }
+
+    if (selected && primaryDomain && !selected.domainHostname) {
+      return 'apply-brand'
+    }
+
+    if (selected && totals.scans === 0) {
+      return 'copy'
+    }
+
+    return selected ? 'analytics' : 'search'
+  }, [domains.length, links.length, primaryDomain, selected, totals.scans])
 
   function selectedDomainIdForCreate() {
     if (createForm.domainId === null) {
@@ -987,6 +1007,20 @@ function Dashboard({ user, onLogout }: { user: AuthUser | null; onLogout: () => 
     requestAnimationFrame(() => searchInputRef.current?.focus())
   }
 
+  function jumpToAnalytics() {
+    jumpToPanel('#analytics')
+  }
+
+  function actionCommandClass(key: ActionKey, primary = false) {
+    return [
+      'action-command',
+      primary ? 'primary-command' : '',
+      recommendedAction === key ? 'recommended-command' : '',
+    ]
+      .filter(Boolean)
+      .join(' ')
+  }
+
   function runAction(action: () => void) {
     setActionCenterOpen(false)
     action()
@@ -1151,7 +1185,7 @@ function Dashboard({ user, onLogout }: { user: AuthUser | null; onLogout: () => 
             >
               <header className="action-center-header">
                 <div>
-                  <small>Waypoint</small>
+                  <small>Next move: {nextMove.title}</small>
                   <h2 id="action-center-title">Action center</h2>
                 </div>
                 <button
@@ -1166,29 +1200,48 @@ function Dashboard({ user, onLogout }: { user: AuthUser | null; onLogout: () => 
               </header>
 
               <div className="action-command-grid">
-                <button className="action-command primary-command" onClick={() => runAction(jumpToCreate)} type="button">
+                <button className={actionCommandClass('new', true)} onClick={() => runAction(jumpToCreate)} type="button">
                   <Plus size={18} />
                   <span>
                     <strong>New code</strong>
                     <small>Create a dynamic QR route</small>
+                    {recommendedAction === 'new' ? <em>Recommended</em> : null}
                   </span>
                 </button>
-                <button className="action-command" onClick={() => runAction(jumpToSearch)} type="button">
+                <button className={actionCommandClass('search')} onClick={() => runAction(jumpToSearch)} type="button">
                   <Search size={18} />
                   <span>
                     <strong>Search links</strong>
                     <small>Find a saved route fast</small>
+                    {recommendedAction === 'search' ? <em>Recommended</em> : null}
                   </span>
                 </button>
-                <button className="action-command" onClick={() => runAction(jumpToDomains)} type="button">
-                  <Globe2 size={18} />
-                  <span>
-                    <strong>Brand domain</strong>
-                    <small>Manage public paths</small>
-                  </span>
-                </button>
+                {selected && primaryDomain && !selected.domainHostname ? (
+                  <button
+                    className={actionCommandClass('apply-brand')}
+                    disabled={busy === 'apply-domain'}
+                    onClick={() => void runAsyncAction(handleApplyPrimaryDomain)}
+                    type="button"
+                  >
+                    <Globe2 size={18} />
+                    <span>
+                      <strong>Apply brand to current link</strong>
+                      <small>{primaryDomain.hostname}</small>
+                      {recommendedAction === 'apply-brand' ? <em>Recommended</em> : null}
+                    </span>
+                  </button>
+                ) : (
+                  <button className={actionCommandClass('brand-domain')} onClick={() => runAction(jumpToDomains)} type="button">
+                    <Globe2 size={18} />
+                    <span>
+                      <strong>{domains.length === 0 ? 'Add brand domain' : 'Brand domain'}</strong>
+                      <small>Manage public paths</small>
+                      {recommendedAction === 'brand-domain' ? <em>Recommended</em> : null}
+                    </span>
+                  </button>
+                )}
                 <button
-                  className="action-command"
+                  className={actionCommandClass('copy')}
                   disabled={!selected}
                   onClick={() => void runAsyncAction(shareFromMission)}
                   type="button"
@@ -1197,6 +1250,20 @@ function Dashboard({ user, onLogout }: { user: AuthUser | null; onLogout: () => 
                   <span>
                     <strong>Copy current link</strong>
                     <small>{selected ? selected.shortUrl : 'Select a route first'}</small>
+                    {recommendedAction === 'copy' ? <em>Recommended</em> : null}
+                  </span>
+                </button>
+                <button
+                  className={actionCommandClass('analytics')}
+                  disabled={!selected}
+                  onClick={() => runAction(jumpToAnalytics)}
+                  type="button"
+                >
+                  <BarChart3 size={18} />
+                  <span>
+                    <strong>View analytics</strong>
+                    <small>{selected ? `${selected.scans} scans captured` : 'Select a route first'}</small>
+                    {recommendedAction === 'analytics' ? <em>Recommended</em> : null}
                   </span>
                 </button>
                 <a className="action-command" href="/api/export/qr.zip" onClick={() => setActionCenterOpen(false)}>

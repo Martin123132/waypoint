@@ -175,7 +175,12 @@ async function run() {
     await actionDialog.waitFor({ timeout: 10000 })
     await actionDialog.getByRole('button', { name: /New code/ }).waitFor({ timeout: 10000 })
     await actionDialog.getByRole('button', { name: /Search links/ }).waitFor({ timeout: 10000 })
-    await actionDialog.getByRole('button', { name: /Brand domain/ }).waitFor({ timeout: 10000 })
+    await actionDialog.getByRole('button', { name: /brand domain/i }).waitFor({ timeout: 10000 })
+    const newCodeCommand = actionDialog.getByRole('button', { name: /New code/ })
+    assert(
+      (await newCodeCommand.getAttribute('class'))?.includes('recommended-command'),
+      'Action center should recommend new code before links exist',
+    )
     assert(
       await actionDialog.getByRole('button', { name: /Copy current link/ }).isDisabled(),
       'Action center copy command should be disabled without a selected link',
@@ -283,6 +288,15 @@ async function run() {
     await shareCard.getByText('Redirect live').waitFor({ timeout: 10000 })
     await shareCard.getByText('Tracking on').waitFor({ timeout: 10000 })
     await detailPanel.getByText('Destination ready').waitFor({ timeout: 10000 })
+    await actionCenterButton.click()
+    await actionDialog.waitFor({ timeout: 10000 })
+    const addBrandCommand = actionDialog.getByRole('button', { name: /Add brand domain/ })
+    assert(
+      (await addBrandCommand.getAttribute('class'))?.includes('recommended-command'),
+      'Action center should recommend adding a brand domain after the first fallback link exists',
+    )
+    await page.keyboard.press('Escape')
+    await actionDialog.waitFor({ state: 'hidden', timeout: 10000 })
     assert(!(await missionShareButton.isDisabled()), 'Share mission chip should enable when a link is selected')
     await missionShareButton.click()
     await page.waitForTimeout(500)
@@ -331,7 +345,15 @@ async function run() {
     await domainPanel.getByRole('button', { name: /Add domain/ }).click()
     await page.getByText('Apply brand to link').waitFor({ timeout: 10000 })
 
-    await page.getByRole('button', { name: 'Use primary' }).first().click()
+    await actionCenterButton.click()
+    await actionDialog.waitFor({ timeout: 10000 })
+    const applyBrandCommand = actionDialog.getByRole('button', { name: /Apply brand to current link/ })
+    await applyBrandCommand.waitFor({ timeout: 10000 })
+    assert(
+      (await applyBrandCommand.getAttribute('class'))?.includes('recommended-command'),
+      'Action center should recommend applying the primary brand to an unbranded link',
+    )
+    await applyBrandCommand.click()
     await page.getByText('Share and watch').waitFor({ timeout: 10000 })
     await page.getByText('Step 4 of 4 - 3 complete').waitFor({ timeout: 10000 })
     await page.getByText('Copy the live path now; scans will turn the last step on.').waitFor({ timeout: 10000 })
@@ -339,6 +361,16 @@ async function run() {
     await page.getByRole('button', { name: 'Branded' }).click()
     await page.getByText('1 of 1 records').waitFor({ timeout: 10000 })
 
+    await actionCenterButton.click()
+    await actionDialog.waitFor({ timeout: 10000 })
+    const copyCurrentCommand = actionDialog.getByRole('button', { name: /Copy current link/ })
+    await copyCurrentCommand.waitFor({ timeout: 10000 })
+    assert(
+      (await copyCurrentCommand.getAttribute('class'))?.includes('recommended-command'),
+      'Action center should recommend copying a branded link before scans exist',
+    )
+    await page.keyboard.press('Escape')
+    await actionDialog.waitFor({ state: 'hidden', timeout: 10000 })
     await page.locator('.next-move').getByRole('button', { name: 'Copy link' }).click()
     await page.waitForTimeout(500)
 

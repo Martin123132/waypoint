@@ -467,6 +467,12 @@
   cursor: not-allowed;
 }
 
+.recommended-command {
+  border-color: rgba(31, 191, 154, 0.68);
+  background: #eefdf9;
+  box-shadow: inset 3px 0 0 #1fbf9a;
+}
+
 .action-command svg {
   flex: 0 0 auto;
   color: #0ea5a4;
@@ -491,10 +497,18 @@
   font-weight: 900;
 }
 
-.action-command small {
+.action-command small,
+.action-command em {
   color: #647286;
   font-size: 12px;
   font-weight: 750;
+}
+
+.action-command em {
+  color: #0e9388;
+  font-style: normal;
+  font-weight: 900;
+  text-transform: uppercase;
 }
 
 .primary-command {
