@@ -546,6 +546,69 @@ function Dashboard({ user, onLogout }: { user: AuthUser | null; onLogout: () => 
 
     return selected ? 'analytics' : 'search'
   }, [domains.length, links.length, primaryDomain, selected, totals.scans])
+  const routeHealth = useMemo(() => {
+    if (!selected || !draft) {
+      return null
+    }
+
+    if (!draftDestinationReady) {
+      return {
+        title: 'Needs destination',
+        detail: 'Add a valid https:// URL before this route is ready.',
+        tone: 'warn',
+        action: 'Review URL',
+        intent: 'review-url',
+      }
+    }
+
+    if (draftDirty) {
+      return {
+        title: 'Unsaved edits',
+        detail: 'Save this draft to update the redirect and QR record.',
+        tone: 'warn',
+        action: 'Save changes',
+        intent: 'save',
+      }
+    }
+
+    if (!selected.active) {
+      return {
+        title: 'Redirect paused',
+        detail: 'This QR is saved, but visitors will not be routed while paused.',
+        tone: 'muted',
+        action: 'Review route',
+        intent: 'review-url',
+      }
+    }
+
+    if (primaryDomain && !selected.domainHostname) {
+      return {
+        title: 'Brand path available',
+        detail: `Apply ${primaryDomain.hostname} to make the public URL cleaner.`,
+        tone: 'good',
+        action: 'Use primary',
+        intent: 'apply-brand',
+      }
+    }
+
+    if (selected.scans === 0) {
+      return {
+        title: 'Ready to share',
+        detail: 'Copy the live path or download the QR and send it out.',
+        tone: 'good',
+        action: 'Copy link',
+        intent: 'copy',
+      }
+    }
+
+    return {
+      title: 'Route healthy',
+      detail: 'This route is live, scan-ready, and gathering activity.',
+      tone: 'good',
+      action: 'View analytics',
+      intent: 'analytics',
+    }
+  }, [draft, draftDestinationReady, draftDirty, primaryDomain, selected])
 
   function selectedDomainIdForCreate() {
     if (createForm.domainId === null) {
@@ -1009,6 +1072,10 @@ function Dashboard({ user, onLogout }: { user: AuthUser | null; onLogout: () => 
 
   function jumpToAnalytics() {
     jumpToPanel('#analytics')
+  }
+
+  function focusRouteEditor() {
+    jumpToPanel('#links')
   }
 
   function actionCommandClass(key: ActionKey, primary = false) {
@@ -1739,6 +1806,68 @@ function Dashboard({ user, onLogout }: { user: AuthUser | null; onLogout: () => 
                     </span>
                   </div>
                 </div>
+
+                {routeHealth ? (
+                  <section className={`route-health ${routeHealth.tone}`} aria-label="Route health">
+                    <div className="route-health-copy">
+                      <small>Route health</small>
+                      <strong>{routeHealth.title}</strong>
+                      <span>{routeHealth.detail}</span>
+                    </div>
+                    <div className="route-health-grid" aria-label="Route checks">
+                      <span className={draftDestinationReady ? 'health-check ready' : 'health-check warn'}>
+                        <ShieldCheck size={15} />
+                        {draftDestinationReady ? 'Destination valid' : 'Needs URL'}
+                      </span>
+                      <span className={selected.domainHostname ? 'health-check ready' : 'health-check neutral'}>
+                        <Globe2 size={15} />
+                        {selected.domainHostname ? 'Branded path' : 'Fallback path'}
+                      </span>
+                      <span className={selected.active ? 'health-check ready' : 'health-check neutral'}>
+                        <Route size={15} />
+                        {selected.active ? 'Redirect live' : 'Redirect paused'}
+                      </span>
+                      <span className={selected.trackScans ? 'health-check ready' : 'health-check neutral'}>
+                        <BarChart3 size={15} />
+                        {selected.trackScans ? 'Tracking on' : 'Tracking off'}
+                      </span>
+                      <span className="health-check ready">
+                        <QrCode size={15} />
+                        QR ready
+                      </span>
+                      <span className="health-check neutral">
+                        <RefreshCw size={15} />
+                        Updated {formatDate(selected.updatedAt)}
+                      </span>
+                    </div>
+                    {routeHealth.intent === 'save' ? (
+                      <button className="secondary-button" onClick={() => void handleSave()} disabled={busy === 'save'}>
+                        <Save size={16} />
+                        {busy === 'save' ? 'Saving' : routeHealth.action}
+                      </button>
+                    ) : routeHealth.intent === 'apply-brand' ? (
+                      <button className="secondary-button" onClick={() => void handleApplyPrimaryDomain()} disabled={busy === 'apply-domain'}>
+                        <Globe2 size={16} />
+                        {busy === 'apply-domain' ? 'Applying' : routeHealth.action}
+                      </button>
+                    ) : routeHealth.intent === 'copy' ? (
+                      <button className="secondary-button" onClick={() => void copyShortUrl()} disabled={busy === 'copy-link'}>
+                        <Copy size={16} />
+                        {busy === 'copy-link' ? 'Copying' : routeHealth.action}
+                      </button>
+                    ) : routeHealth.intent === 'analytics' ? (
+                      <button className="secondary-button" onClick={jumpToAnalytics}>
+                        <BarChart3 size={16} />
+                        {routeHealth.action}
+                      </button>
+                    ) : (
+                      <button className="secondary-button" onClick={focusRouteEditor}>
+                        <ArrowRight size={16} />
+                        {routeHealth.action}
+                      </button>
+                    )}
+                  </section>
+                ) : null}
 
                 <div className="detail-body">
                   <div className="qr-preview">

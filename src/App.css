@@ -1171,6 +1171,101 @@ button:disabled {
   flex-wrap: wrap;
 }
 
+.route-health {
+  display: grid;
+  grid-template-columns: minmax(180px, 0.8fr) minmax(0, 1.5fr) auto;
+  gap: 12px;
+  align-items: center;
+  margin: 16px 0 18px;
+  padding: 14px;
+  border: 1px solid #d8e0ea;
+  border-radius: 8px;
+  background: #f8fafc;
+}
+
+.route-health.good {
+  border-color: rgba(31, 191, 154, 0.36);
+  background: #f7fffd;
+}
+
+.route-health.warn {
+  border-color: #fde68a;
+  background: #fffbeb;
+}
+
+.route-health.muted {
+  background: #f8fafc;
+}
+
+.route-health-copy {
+  display: grid;
+  min-width: 0;
+  gap: 4px;
+}
+
+.route-health-copy small {
+  color: #0e9388;
+  font-size: 11px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.route-health-copy strong {
+  color: #0d1824;
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.route-health-copy span {
+  color: #647286;
+  font-size: 12px;
+  font-weight: 750;
+  line-height: 1.35;
+}
+
+.route-health-grid {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+.health-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 30px;
+  padding: 0 9px;
+  border: 1px solid #d8e0ea;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #475569;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.health-check.ready {
+  border-color: #a7f3d0;
+  background: #ecfdf5;
+  color: #047857;
+}
+
+.health-check.warn {
+  border-color: #fde68a;
+  background: #fffbeb;
+  color: #92400e;
+}
+
+.health-check svg {
+  flex: 0 0 auto;
+}
+
+.route-health .secondary-button {
+  min-height: 36px;
+  white-space: nowrap;
+}
+
 .detail-body {
   display: grid;
   grid-template-columns: minmax(220px, 300px) minmax(0, 1fr);
@@ -1525,6 +1620,14 @@ button:disabled {
     grid-template-columns: 1fr;
   }
 
+  .route-health {
+    grid-template-columns: 1fr;
+  }
+
+  .route-health .secondary-button {
+    justify-self: start;
+  }
+
   .qr-frame {
     min-height: 220px;
   }
@@ -1615,6 +1718,10 @@ button:disabled {
 
   .share-actions {
     grid-template-columns: 1fr;
+  }
+
+  .route-health .secondary-button {
+    justify-self: stretch;
   }
 
   .domain-actions {
