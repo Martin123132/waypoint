@@ -155,18 +155,50 @@ async function run() {
     const missionCreateButton = missionActions.getByRole('button', { name: 'Create first code' })
     const missionDomainButton = missionActions.getByRole('button', { name: 'Add brand domain' })
     const missionShareButton = missionActions.getByRole('button', { name: 'Share link' })
+    const actionCenterButton = page.getByTitle('Open actions')
     const dockNewButton = page.getByRole('button', { name: 'New' })
     const dockSearchButton = page.getByRole('button', { name: 'Search' })
     const dockDomainButton = page.getByRole('button', { name: 'Domains' })
     await missionCreateButton.waitFor({ timeout: 10000 })
     await missionDomainButton.waitFor({ timeout: 10000 })
     await missionShareButton.waitFor({ timeout: 10000 })
+    await actionCenterButton.waitFor({ timeout: 10000 })
     await dockNewButton.waitFor({ timeout: 10000 })
     await dockSearchButton.waitFor({ timeout: 10000 })
     await dockDomainButton.waitFor({ timeout: 10000 })
     await page.getByText('Ready for the first route').waitFor({ timeout: 10000 })
     await page.getByText('Create a code to open the share kit, QR downloads, and analytics here.').waitFor({ timeout: 10000 })
     assert(await missionShareButton.isDisabled(), 'Share mission chip should be disabled without a selected link')
+
+    await actionCenterButton.click()
+    const actionDialog = page.getByRole('dialog', { name: 'Action center' })
+    await actionDialog.waitFor({ timeout: 10000 })
+    await actionDialog.getByRole('button', { name: /New code/ }).waitFor({ timeout: 10000 })
+    await actionDialog.getByRole('button', { name: /Search links/ }).waitFor({ timeout: 10000 })
+    await actionDialog.getByRole('button', { name: /Brand domain/ }).waitFor({ timeout: 10000 })
+    assert(
+      await actionDialog.getByRole('button', { name: /Copy current link/ }).isDisabled(),
+      'Action center copy command should be disabled without a selected link',
+    )
+    await actionDialog.getByRole('button', { name: /New code/ }).click()
+
+    const createTitleFieldFromAction = page.getByRole('textbox', { name: 'Title' })
+    await createTitleFieldFromAction.waitFor({ state: 'visible', timeout: 10000 })
+    assert(
+      await createTitleFieldFromAction.evaluate((node) => node === document.activeElement),
+      'Action center new command did not focus the title field',
+    )
+
+    await page.keyboard.press('Control+K')
+    await actionDialog.waitFor({ timeout: 10000 })
+    await actionDialog.getByRole('button', { name: /Search links/ }).click()
+    const searchFieldFromAction = page.getByRole('textbox', { name: 'Search links' })
+    await searchFieldFromAction.waitFor({ state: 'visible', timeout: 10000 })
+    assert(
+      await searchFieldFromAction.evaluate((node) => node === document.activeElement),
+      'Action center search command did not focus the search field',
+    )
+
     await missionCreateButton.click()
 
     const createTitleFieldFromChip = page.getByRole('textbox', { name: 'Title' })

@@ -388,6 +388,120 @@
   color: #0ea5a4;
 }
 
+.action-center-trigger {
+  border-color: rgba(31, 191, 154, 0.42);
+  background: #eefdf9;
+}
+
+.action-center-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: grid;
+  place-items: start center;
+  padding: 92px 20px 20px;
+  background: rgba(15, 23, 34, 0.42);
+}
+
+.action-center {
+  width: min(720px, 100%);
+  overflow: hidden;
+  border: 1px solid rgba(216, 224, 234, 0.86);
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: 0 26px 70px rgba(15, 23, 34, 0.26);
+}
+
+.action-center-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 18px;
+  border-bottom: 1px solid #e1e8f0;
+  background: #f8fafc;
+}
+
+.action-center-header small {
+  color: #0e9388;
+  font-size: 11px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.action-center-header h2 {
+  margin: 3px 0 0;
+  color: #0d1824;
+  font-size: 20px;
+  line-height: 1.15;
+}
+
+.action-command-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  padding: 14px;
+}
+
+.action-command {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 74px;
+  padding: 12px;
+  border: 1px solid #d8e0ea;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #172334;
+  text-align: left;
+  text-decoration: none;
+}
+
+.action-command:hover {
+  border-color: rgba(14, 165, 164, 0.42);
+  background: #f7fffd;
+}
+
+.action-command:disabled {
+  opacity: 0.56;
+  cursor: not-allowed;
+}
+
+.action-command svg {
+  flex: 0 0 auto;
+  color: #0ea5a4;
+}
+
+.action-command span {
+  display: grid;
+  min-width: 0;
+  gap: 3px;
+}
+
+.action-command strong,
+.action-command small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.action-command strong {
+  color: #0d1824;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.action-command small {
+  color: #647286;
+  font-size: 12px;
+  font-weight: 750;
+}
+
+.primary-command {
+  border-color: rgba(31, 191, 154, 0.48);
+  background: #eefdf9;
+}
+
 .guide-step {
   display: flex;
   align-items: center;
@@ -1520,6 +1634,20 @@ button:disabled {
 
   .dock-action {
     min-width: 94px;
+  }
+
+  .action-center-backdrop {
+    align-items: end;
+    padding: 18px;
+  }
+
+  .action-command-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .action-command strong,
+  .action-command small {
+    white-space: normal;
   }
 
   .empty-detail {

@@ -21,6 +21,7 @@ import {
   Search,
   ShieldCheck,
   Trash2,
+  X,
 } from 'lucide-react'
 import './App.css'
 import {
@@ -325,6 +326,7 @@ function Dashboard({ user, onLogout }: { user: AuthUser | null; onLogout: () => 
   const [error, setError] = useState('')
   const [copyFallback, setCopyFallback] = useState<{ linkId: string; url: string } | null>(null)
   const [deleteConfirmId, setDeleteConfirmId] = useState('')
+  const [actionCenterOpen, setActionCenterOpen] = useState(false)
   const [showStarterTip, setShowStarterTip] = useState(() => {
     try {
       return !sessionStorage.getItem('waypoint_starter_tip_seen')
@@ -622,6 +624,20 @@ function Dashboard({ user, onLogout }: { user: AuthUser | null; onLogout: () => 
 
   useEffect(() => {
     function handleShortcut(event: KeyboardEvent) {
+      const key = event.key.toLowerCase()
+
+      if (key === 'escape' && actionCenterOpen) {
+        event.preventDefault()
+        setActionCenterOpen(false)
+        return
+      }
+
+      if ((event.ctrlKey || event.metaKey) && key === 'k') {
+        event.preventDefault()
+        setActionCenterOpen(true)
+        return
+      }
+
       if (event.defaultPrevented || event.ctrlKey || event.metaKey || event.altKey) {
         return
       }
@@ -632,7 +648,6 @@ function Dashboard({ user, onLogout }: { user: AuthUser | null; onLogout: () => 
         return
       }
 
-      const key = event.key.toLowerCase()
       if (key === 'n') {
         event.preventDefault()
         jumpToPanel('#create')
@@ -658,7 +673,7 @@ function Dashboard({ user, onLogout }: { user: AuthUser | null; onLogout: () => 
     return () => {
       window.removeEventListener('keydown', handleShortcut)
     }
-  }, [jumpToPanel])
+  }, [actionCenterOpen, jumpToPanel])
 
   useEffect(() => {
     let active = true
@@ -972,6 +987,16 @@ function Dashboard({ user, onLogout }: { user: AuthUser | null; onLogout: () => 
     requestAnimationFrame(() => searchInputRef.current?.focus())
   }
 
+  function runAction(action: () => void) {
+    setActionCenterOpen(false)
+    action()
+  }
+
+  async function runAsyncAction(action: () => Promise<void>) {
+    setActionCenterOpen(false)
+    await action()
+  }
+
   async function shareFromMission() {
     if (!selected) {
       jumpToPanel('#links')
@@ -1093,6 +1118,10 @@ function Dashboard({ user, onLogout }: { user: AuthUser | null; onLogout: () => 
         </section>
 
         <section className="action-dock" aria-label="Quick actions">
+          <button className="dock-action action-center-trigger" onClick={() => setActionCenterOpen(true)} title="Open actions" type="button">
+            <Compass size={17} />
+            <span>Actions</span>
+          </button>
           <button className="dock-action" onClick={jumpToCreate} title="New code" type="button">
             <Plus size={17} />
             <span>New</span>
@@ -1110,6 +1139,84 @@ function Dashboard({ user, onLogout }: { user: AuthUser | null; onLogout: () => 
             <span>QR ZIP</span>
           </a>
         </section>
+
+        {actionCenterOpen ? (
+          <div className="action-center-backdrop" onClick={() => setActionCenterOpen(false)}>
+            <section
+              aria-labelledby="action-center-title"
+              aria-modal="true"
+              className="action-center"
+              onClick={(event) => event.stopPropagation()}
+              role="dialog"
+            >
+              <header className="action-center-header">
+                <div>
+                  <small>Waypoint</small>
+                  <h2 id="action-center-title">Action center</h2>
+                </div>
+                <button
+                  aria-label="Close actions"
+                  className="icon-button"
+                  onClick={() => setActionCenterOpen(false)}
+                  title="Close actions"
+                  type="button"
+                >
+                  <X size={18} />
+                </button>
+              </header>
+
+              <div className="action-command-grid">
+                <button className="action-command primary-command" onClick={() => runAction(jumpToCreate)} type="button">
+                  <Plus size={18} />
+                  <span>
+                    <strong>New code</strong>
+                    <small>Create a dynamic QR route</small>
+                  </span>
+                </button>
+                <button className="action-command" onClick={() => runAction(jumpToSearch)} type="button">
+                  <Search size={18} />
+                  <span>
+                    <strong>Search links</strong>
+                    <small>Find a saved route fast</small>
+                  </span>
+                </button>
+                <button className="action-command" onClick={() => runAction(jumpToDomains)} type="button">
+                  <Globe2 size={18} />
+                  <span>
+                    <strong>Brand domain</strong>
+                    <small>Manage public paths</small>
+                  </span>
+                </button>
+                <button
+                  className="action-command"
+                  disabled={!selected}
+                  onClick={() => void runAsyncAction(shareFromMission)}
+                  type="button"
+                >
+                  <Copy size={18} />
+                  <span>
+                    <strong>Copy current link</strong>
+                    <small>{selected ? selected.shortUrl : 'Select a route first'}</small>
+                  </span>
+                </button>
+                <a className="action-command" href="/api/export/qr.zip" onClick={() => setActionCenterOpen(false)}>
+                  <PackageCheck size={18} />
+                  <span>
+                    <strong>Download QR ZIP</strong>
+                    <small>Export all QR files</small>
+                  </span>
+                </a>
+                <a className="action-command" href="/api/export/links.csv" onClick={() => setActionCenterOpen(false)}>
+                  <Download size={18} />
+                  <span>
+                    <strong>Export CSV</strong>
+                    <small>Download link records</small>
+                  </span>
+                </a>
+              </div>
+            </section>
+          </div>
+        ) : null}
 
         <section className="guide-strip" aria-label="Launch path">
           {guideSteps.map((step) => (
