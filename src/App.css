@@ -1521,4 +1521,19 @@ button:disabled {
   .dock-action {
     min-width: 94px;
   }
+
+  .empty-detail {
+    min-height: 320px;
+    padding: 22px;
+  }
+
+  .empty-actions {
+    align-items: stretch;
+    width: 100%;
+  }
+
+  .empty-actions .primary-button,
+  .empty-actions .secondary-button {
+    flex: 1 1 180px;
+  }
 }
