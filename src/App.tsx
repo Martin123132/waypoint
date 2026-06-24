@@ -523,6 +523,7 @@ function Dashboard({ user, onLogout }: { user: AuthUser | null; onLogout: () => 
   }, [domains.length, links.length, primaryDomain, selected, totals.scans])
   const activeCopyFallback = copyFallback?.linkId === selected?.id ? copyFallback : null
   const canShareSelected = Boolean(selected)
+  const hasActiveFilters = Boolean(linkSearch.trim()) || linkFilter !== 'all'
 
   function selectedDomainIdForCreate() {
     if (createForm.domainId === null) {
@@ -959,6 +960,18 @@ function Dashboard({ user, onLogout }: { user: AuthUser | null; onLogout: () => 
     requestAnimationFrame(() => domainHostnameRef.current?.focus())
   }
 
+  function jumpToSearch() {
+    jumpToPanel('#links')
+    requestAnimationFrame(() => searchInputRef.current?.focus())
+  }
+
+  function resetLinkView() {
+    setLinkSearch('')
+    setLinkFilter('all')
+    jumpToPanel('#links')
+    requestAnimationFrame(() => searchInputRef.current?.focus())
+  }
+
   async function shareFromMission() {
     if (!selected) {
       jumpToPanel('#links')
@@ -1077,6 +1090,25 @@ function Dashboard({ user, onLogout }: { user: AuthUser | null; onLogout: () => 
             <Copy size={16} />
             <span>Share link</span>
           </button>
+        </section>
+
+        <section className="action-dock" aria-label="Quick actions">
+          <button className="dock-action" onClick={jumpToCreate} title="New code" type="button">
+            <Plus size={17} />
+            <span>New</span>
+          </button>
+          <button className="dock-action" onClick={jumpToSearch} title="Search links" type="button">
+            <Search size={17} />
+            <span>Search</span>
+          </button>
+          <button className="dock-action" onClick={jumpToDomains} title="Manage domains" type="button">
+            <Globe2 size={17} />
+            <span>Domains</span>
+          </button>
+          <a className="dock-action" href="/api/export/qr.zip" title="Download QR pack">
+            <PackageCheck size={17} />
+            <span>QR ZIP</span>
+          </a>
         </section>
 
         <section className="guide-strip" aria-label="Launch path">
@@ -1455,9 +1487,33 @@ function Dashboard({ user, onLogout }: { user: AuthUser | null; onLogout: () => 
               </div>
 
               <div className="link-rows">
-                {links.length === 0 && !loading ? <div className="empty-state">No links yet.</div> : null}
+                {links.length === 0 && !loading ? (
+                  <div className="empty-state guided-empty">
+                    <QrCode size={34} />
+                    <strong>No links yet.</strong>
+                    <span>Create one route and Waypoint will generate the redirect, QR, and fallback path.</span>
+                    <button className="secondary-button" onClick={jumpToCreate} type="button">
+                      <Plus size={16} />
+                      Create first code
+                    </button>
+                  </div>
+                ) : null}
                 {links.length > 0 && filteredLinks.length === 0 ? (
-                  <div className="empty-state">No links match this view.</div>
+                  <div className="empty-state guided-empty">
+                    <Search size={34} />
+                    <strong>No links match this view.</strong>
+                    <span>Clear the filters or create a fresh route from here.</span>
+                    <div className="empty-actions">
+                      <button className="secondary-button" onClick={resetLinkView} type="button">
+                        <RefreshCw size={16} />
+                        Reset view
+                      </button>
+                      <button className="secondary-button" onClick={jumpToCreate} type="button">
+                        <Plus size={16} />
+                        New code
+                      </button>
+                    </div>
+                  </div>
                 ) : null}
                 {filteredLinks.map((link) => (
                   <button
@@ -1519,6 +1575,11 @@ function Dashboard({ user, onLogout }: { user: AuthUser | null; onLogout: () => 
                       <span>Share kit</span>
                       <strong>{selected.shortUrl}</strong>
                       {selected.domainHostname ? <small>Fallback: {selected.fallbackUrl}</small> : <small>Fallback path ready</small>}
+                      <div className="share-badges" aria-label="Share readiness">
+                        <span>QR ready</span>
+                        <span>{selected.active ? 'Redirect live' : 'Redirect paused'}</span>
+                        <span>{selected.trackScans ? 'Tracking on' : 'Tracking off'}</span>
+                      </div>
                       <div className="share-actions">
                         <button className="secondary-button" onClick={() => void copyShortUrl()}>
                           <Copy size={16} />
@@ -1743,7 +1804,31 @@ function Dashboard({ user, onLogout }: { user: AuthUser | null; onLogout: () => 
             ) : (
               <div className="empty-detail">
                 <QrCode size={48} />
-                <h2>No link selected</h2>
+                <h2>{links.length === 0 ? 'Ready for the first route' : 'Choose the next route'}</h2>
+                <p>
+                  {links.length === 0
+                    ? 'Create a code to open the share kit, QR downloads, and analytics here.'
+                    : hasActiveFilters
+                      ? 'Reset the current view or create another code from here.'
+                      : 'Select a saved link or start a new one from the actions above.'}
+                </p>
+                <div className="empty-actions">
+                  <button className="primary-button" onClick={jumpToCreate} type="button">
+                    <Plus size={17} />
+                    {links.length === 0 ? 'Create first code' : 'New code'}
+                  </button>
+                  {hasActiveFilters ? (
+                    <button className="secondary-button" onClick={resetLinkView} type="button">
+                      <RefreshCw size={16} />
+                      Reset view
+                    </button>
+                  ) : (
+                    <button className="secondary-button" onClick={jumpToDomains} type="button">
+                      <Globe2 size={16} />
+                      Add domain
+                    </button>
+                  )}
+                </div>
               </div>
             )}
           </section>

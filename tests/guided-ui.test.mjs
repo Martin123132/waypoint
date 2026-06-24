@@ -151,12 +151,21 @@ async function run() {
     await page.getByText('Shortcut: N = New, / = Search, D = Domains').waitFor({ timeout: 10000 })
     const starterTip = page.getByText(/Try\s+N\s*=\s*New,\s*\/\s*=\s*Search,\s*D\s*=\s*Domains/i)
     await starterTip.waitFor({ timeout: 10000 })
-    const missionCreateButton = page.getByRole('button', { name: 'Create first code' })
-    const missionDomainButton = page.getByRole('button', { name: 'Add brand domain' })
-    const missionShareButton = page.getByRole('button', { name: 'Share link' })
+    const missionActions = page.getByLabel('Mission actions')
+    const missionCreateButton = missionActions.getByRole('button', { name: 'Create first code' })
+    const missionDomainButton = missionActions.getByRole('button', { name: 'Add brand domain' })
+    const missionShareButton = missionActions.getByRole('button', { name: 'Share link' })
+    const dockNewButton = page.getByRole('button', { name: 'New' })
+    const dockSearchButton = page.getByRole('button', { name: 'Search' })
+    const dockDomainButton = page.getByRole('button', { name: 'Domains' })
     await missionCreateButton.waitFor({ timeout: 10000 })
     await missionDomainButton.waitFor({ timeout: 10000 })
     await missionShareButton.waitFor({ timeout: 10000 })
+    await dockNewButton.waitFor({ timeout: 10000 })
+    await dockSearchButton.waitFor({ timeout: 10000 })
+    await dockDomainButton.waitFor({ timeout: 10000 })
+    await page.getByText('Ready for the first route').waitFor({ timeout: 10000 })
+    await page.getByText('Create a code to open the share kit, QR downloads, and analytics here.').waitFor({ timeout: 10000 })
     assert(await missionShareButton.isDisabled(), 'Share mission chip should be disabled without a selected link')
     await missionCreateButton.click()
 
@@ -173,6 +182,14 @@ async function run() {
     assert(
       await missionDomainField.evaluate((node) => node === document.activeElement),
       'Domain mission chip did not focus the hostname field',
+    )
+
+    await dockSearchButton.click()
+    const dockSearchField = page.getByRole('textbox', { name: 'Search links' })
+    await dockSearchField.waitFor({ state: 'visible', timeout: 10000 })
+    assert(
+      await dockSearchField.evaluate((node) => node === document.activeElement),
+      'Search dock action did not focus the search field',
     )
 
     await page.getByRole('button', { name: 'Got it' }).click()
@@ -230,6 +247,9 @@ async function run() {
     const shareCard = detailPanel.locator('.share-card')
     await detailPanel.getByText('Share kit').waitFor({ timeout: 10000 })
     await shareCard.getByText(`${baseUrl}/r/${slug}`).waitFor({ timeout: 10000 })
+    await shareCard.getByText('QR ready').waitFor({ timeout: 10000 })
+    await shareCard.getByText('Redirect live').waitFor({ timeout: 10000 })
+    await shareCard.getByText('Tracking on').waitFor({ timeout: 10000 })
     await detailPanel.getByText('Destination ready').waitFor({ timeout: 10000 })
     assert(!(await missionShareButton.isDisabled()), 'Share mission chip should enable when a link is selected')
     await missionShareButton.click()
@@ -306,7 +326,7 @@ async function run() {
 
     await detailPanel.getByRole('button', { name: 'Confirm delete' }).click()
     await page.getByText('No links yet.').waitFor({ timeout: 10000 })
-    await page.getByText('No link selected').waitFor({ timeout: 10000 })
+    await page.getByText('Ready for the first route').waitFor({ timeout: 10000 })
     await page.getByText('Build first code').waitFor({ timeout: 10000 })
     await page.getByText('Step 1 of 4 - 0 complete').waitFor({ timeout: 10000 })
     const remainingLinkRows = await page.locator('.link-row').count()
