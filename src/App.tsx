@@ -1090,12 +1090,14 @@ function Dashboard({ user, onLogout }: { user: AuthUser | null; onLogout: () => 
 
   function runAction(action: () => void) {
     setActionCenterOpen(false)
-    action()
+    window.setTimeout(action, 0)
   }
 
   async function runAsyncAction(action: () => Promise<void>) {
     setActionCenterOpen(false)
-    await action()
+    window.setTimeout(() => {
+      void action()
+    }, 0)
   }
 
   async function shareFromMission() {
