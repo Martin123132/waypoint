@@ -177,4 +177,6 @@ Generate a local dry-run release-review report with `npm run release:review:writ
 
 ## License
 
-MIT
+Waypoint is source-available for personal and non-commercial use under the PolyForm Noncommercial License 1.0.0.
+
+Commercial use requires a separate written license from TWO HANDS NETWORK LTD. See [COMMERCIAL-LICENSE.md](COMMERCIAL-LICENSE.md).

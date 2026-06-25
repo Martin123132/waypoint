@@ -26,9 +26,9 @@ body:
   - type: checkboxes
     id: public_posture
     attributes:
-      label: Public open-source posture
+      label: Public source-available posture
       options:
-        - label: MIT license is present and unchanged unless a deliberate legal review happened.
+        - label: PolyForm Noncommercial license is present and commercial licensing guidance is linked.
           required: true
         - label: README links to contributor, security, status, issue-intake, and synthetic demo material.
           required: true
@@ -51,4 +51,3 @@ body:
       label: Release notes draft
       description: Public-safe summary only. Do not paste private URLs, real QR payloads, credentials, internal logs, or customer data.
       placeholder: Summarize user-facing changes, compatibility notes, and verification evidence.
-

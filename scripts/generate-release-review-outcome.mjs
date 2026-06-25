@@ -35,9 +35,9 @@ This is a public-safe dry-run outcome. It does not create a release, tag, packag
 - Demo fallback route: \`http://qr.example.test/r/launch\`
 - Demo status: \`<pass/fail>\`
 
-## Open-Source And Security Posture
+## Source-Available And Security Posture
 
-- License posture: MIT/open source confirmed.
+- License posture: PolyForm Noncommercial/source-available posture confirmed; commercial use requires a separate written license.
 - Security guidance: \`SECURITY.md\` present and checked.
 - Release review intake: \`.github/ISSUE_TEMPLATE/release-review.yml\` present and checked.
 - Public readiness verifier: \`tests/public-readiness.test.mjs\` present and checked.

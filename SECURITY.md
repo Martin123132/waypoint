@@ -2,7 +2,7 @@
 
 ## Supported Version
 
-Waypoint is early-stage open source software. Security fixes target the `main` branch until tagged releases exist.
+Waypoint is early-stage source-available software. Security fixes target the `main` branch until tagged releases exist.
 
 ## Reporting a Vulnerability
 
@@ -17,4 +17,3 @@ Useful reports include:
 - Whether authentication is required
 
 Please do not submit live credentials, production databases, private logs, or personal data.
-

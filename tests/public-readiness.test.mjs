@@ -9,6 +9,8 @@ const projectRoot = dirname(fileURLToPath(new URL('../package.json', import.meta
 const requiredFiles = [
   'README.md',
   'LICENSE',
+  'COMMERCIAL-LICENSE.md',
+  'NOTICE.md',
   'CONTRIBUTING.md',
   'SECURITY.md',
   'LOCAL_STORAGE_POLICY.md',
@@ -76,6 +78,7 @@ assertIncludes('README.md', '[Contributing](CONTRIBUTING.md)')
 assertIncludes('README.md', '[Security Policy](SECURITY.md)')
 assertIncludes('README.md', '[Project Status](PROJECT_STATUS.md)')
 assertIncludes('README.md', '[Local Storage Policy](LOCAL_STORAGE_POLICY.md)')
+assertIncludes('README.md', '[COMMERCIAL-LICENSE.md](COMMERCIAL-LICENSE.md)')
 assertIncludes('README.md', '[Release review outcome template](docs/release-review-outcome-template.md)')
 assertIncludes('README.md', '[Release review dry-run sample](docs/release-review-outcome.sample.md)')
 assertIncludes('README.md', '.github/ISSUE_TEMPLATE/domain-routing.yml')
@@ -104,8 +107,10 @@ assertIncludes('SECURITY.md', 'avoid posting exploit details')
 assertIncludes('SECURITY.md', 'synthetic data')
 assertIncludes('SECURITY.md', 'Please do not submit live credentials')
 
-assertIncludes('LICENSE', 'MIT License')
-assertIncludes('LICENSE', 'Permission is hereby granted, free of charge')
+assertIncludes('LICENSE', 'PolyForm Noncommercial License 1.0.0')
+assertIncludes('LICENSE', 'Required Notice: waypoint is source-available for personal and non-commercial use')
+assertIncludes('COMMERCIAL-LICENSE.md', 'No commercial license is granted unless agreed in writing by TWO HANDS NETWORK LTD.')
+assertIncludes('NOTICE.md', 'TWO HANDS NETWORK LTD')
 
 assertIncludes('.github/ISSUE_TEMPLATE/config.yml', 'blank_issues_enabled: false')
 assertIncludes('.github/ISSUE_TEMPLATE/config.yml', 'https://github.com/Martin123132/waypoint/security/policy')
@@ -141,7 +146,7 @@ assertIncludes('.github/ISSUE_TEMPLATE/release-review.yml', 'Opening this issue 
 assertIncludes('.github/ISSUE_TEMPLATE/release-review.yml', '`npm run verify` passes locally.')
 assertIncludes('.github/ISSUE_TEMPLATE/release-review.yml', 'Public readiness check passes through `npm run test:readiness`.')
 assertIncludes('.github/ISSUE_TEMPLATE/release-review.yml', 'Synthetic example verifier passes through `npm run test:examples`.')
-assertIncludes('.github/ISSUE_TEMPLATE/release-review.yml', 'MIT license is present')
+assertIncludes('.github/ISSUE_TEMPLATE/release-review.yml', 'PolyForm Noncommercial license is present')
 assertIncludes('.github/ISSUE_TEMPLATE/release-review.yml', 'Examples use only `go.example.test`, `qr.example.test`, and `example.com` payloads.')
 assertIncludes('.github/ISSUE_TEMPLATE/release-review.yml', 'real QR payloads')
 assertIncludes('.github/ISSUE_TEMPLATE/release-review.yml', 'production domains')
@@ -151,7 +156,7 @@ assertIncludes('docs/release-review-outcome-template.md', 'Local verification co
 assertIncludes('docs/release-review-outcome-template.md', 'Public readiness command: `npm run test:readiness`')
 assertIncludes('docs/release-review-outcome-template.md', 'Synthetic examples command: `npm run test:examples`')
 assertIncludes('docs/release-review-outcome-template.md', 'GitHub Actions CI URL: `https://github.com/Martin123132/waypoint/actions/runs/<run-id>`')
-assertIncludes('docs/release-review-outcome-template.md', 'MIT/open source confirmed')
+assertIncludes('docs/release-review-outcome-template.md', 'PolyForm Noncommercial/source-available posture confirmed')
 assertIncludes('docs/release-review-outcome-template.md', 'SECURITY.md')
 assertIncludes('docs/release-review-outcome-template.md', 'No real QR payloads in proof material')
 assertIncludes('docs/release-review-outcome-template.md', 'No private URLs in proof material')
@@ -172,7 +177,7 @@ assertIncludes('scripts/generate-release-review-outcome.mjs', 'does not create a
 assertIncludes('scripts/generate-release-review-outcome.mjs', "join('outputs', 'release-review-dry-run.md')")
 assertIncludes('scripts/generate-release-review-outcome.mjs', '--out requires a file path')
 assertIncludes('scripts/generate-release-review-outcome.mjs', 'GitHub Actions CI URL')
-assertIncludes('scripts/generate-release-review-outcome.mjs', 'MIT/open source confirmed')
+assertIncludes('scripts/generate-release-review-outcome.mjs', 'PolyForm Noncommercial/source-available posture confirmed')
 assertIncludes('scripts/generate-release-review-outcome.mjs', 'No real QR payloads in proof material')
 assertIncludes('scripts/generate-release-review-outcome.mjs', 'No private URLs in proof material')
 assertIncludes('scripts/generate-release-review-outcome.mjs', 'No secrets, credentials, cookies, tokens, or API keys in proof material')
@@ -182,7 +187,7 @@ assertIncludes('docs/release-review-outcome.sample.md', 'This is a public-safe d
 assertIncludes('docs/release-review-outcome.sample.md', 'Local verification command: `npm run verify`')
 assertIncludes('docs/release-review-outcome.sample.md', 'GitHub Actions CI URL: `https://github.com/Martin123132/waypoint/actions/runs/<run-id>`')
 assertIncludes('docs/release-review-outcome.sample.md', 'Demo QR payload: `http://go.example.test/launch`')
-assertIncludes('docs/release-review-outcome.sample.md', 'MIT/open source confirmed')
+assertIncludes('docs/release-review-outcome.sample.md', 'PolyForm Noncommercial/source-available posture confirmed')
 assertIncludes('docs/release-review-outcome.sample.md', 'No datasets, customer data, personal data, internal logs, private screenshots, or proprietary material')
 
 const generatedOutcome = execFileSync(process.execPath, [join(projectRoot, 'scripts/generate-release-review-outcome.mjs')], {
@@ -223,7 +228,7 @@ const allowedSecretLikeLines = [
   'Do not include secrets',
   'Do not post secrets',
   'without posting secrets',
-  'open source software. Security fixes',
+  'source-available software. Security fixes',
 ]
 
 for (const file of publicReadinessFiles) {

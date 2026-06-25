@@ -33,9 +33,9 @@ Copy this file into an issue or review note when preparing a release. Keep every
 - Demo redirect target: `https://example.com/waypoint-demo`
 - Demo fallback route: `http://qr.example.test/r/launch`
 
-## Open-Source And Safety Posture
+## Source-Available And Safety Posture
 
-- License posture: MIT/open source confirmed.
+- License posture: PolyForm Noncommercial/source-available posture confirmed; commercial use requires a separate written license.
 - Security guidance: `SECURITY.md` is present and points vulnerability reports away from public exploit details.
 - Release-review intake: `.github/ISSUE_TEMPLATE/release-review.yml` is present.
 - Public readiness check: `tests/public-readiness.test.mjs` covers public docs and issue-intake drift.
@@ -57,4 +57,3 @@ Confirm all of the following before using this as release-review evidence:
 - Release review outcome: `<ready/not ready>`
 - Follow-up issue links: `<public-safe links only>`
 - Notes: `<public-safe summary only>`
-

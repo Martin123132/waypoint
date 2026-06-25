@@ -2,14 +2,14 @@
 
 ## What This Is
 
-Waypoint is a self-hosted dynamic QR code and short-link manager. It is intended to be a free, open-source alternative to subscription QR link services.
+Waypoint is a self-hosted dynamic QR code and short-link manager. It is intended to be a free, source-available alternative to subscription QR link services for personal and non-commercial use.
 
 ## Current Shape
 
 - Public repo: `Martin123132/waypoint`
 - Main branch: `main`
 - Runtime: Node.js 24, Fastify, React, Vite, SQLite via `node:sqlite`
-- License: MIT
+- License: PolyForm Noncommercial License 1.0.0; commercial use requires a separate written license
 - Verification: `npm run verify`
 - CI: GitHub Actions runs the same verification path on pushes and pull requests
 
@@ -36,9 +36,9 @@ Reports should use synthetic domains, URLs, screenshots, and CSV rows. Do not po
 
 ## Release Readiness
 
-`.github/ISSUE_TEMPLATE/release-review.yml` provides a pre-release review checklist. It requires `npm run verify`, public readiness, the examples verifier, CI on `main`, MIT/open-source posture, and synthetic-only proof material. It does not create a release, tag, package, or deployment.
+`.github/ISSUE_TEMPLATE/release-review.yml` provides a pre-release review checklist. It requires `npm run verify`, public readiness, the examples verifier, CI on `main`, source-available non-commercial license posture, and synthetic-only proof material. It does not create a release, tag, package, or deployment.
 
-`docs/release-review-outcome-template.md` provides a dry-run evidence record for future release review outcomes. It records local verification, public readiness, examples verification, GitHub Actions CI URL, synthetic demo status, MIT/open-source posture, security guidance, and confirmation that proof material contains no real QR payloads, private URLs, secrets, production domains, datasets, or proprietary material.
+`docs/release-review-outcome-template.md` provides a dry-run evidence record for future release review outcomes. It records local verification, public readiness, examples verification, GitHub Actions CI URL, synthetic demo status, source-available non-commercial license posture, security guidance, and confirmation that proof material contains no real QR payloads, private URLs, secrets, production domains, datasets, or proprietary material.
 
 `npm run release:review:dry-run` prints a sanitized release-review outcome with placeholder CI URL/result fields. Its checked sample is `docs/release-review-outcome.sample.md`.
 
