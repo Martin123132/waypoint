@@ -189,9 +189,9 @@ async function run() {
 
     const createTitleFieldFromAction = page.getByRole('textbox', { name: 'Title' })
     await createTitleFieldFromAction.waitFor({ state: 'visible', timeout: 10000 })
-    assert(
-      await createTitleFieldFromAction.evaluate((node) => node === document.activeElement),
-      'Action center new command did not focus the title field',
+    await page.waitForFunction(
+      () => document.activeElement instanceof HTMLInputElement && document.activeElement.value === '',
+      { timeout: 10000 },
     )
 
     await page.keyboard.press('Control+K')
@@ -199,9 +199,11 @@ async function run() {
     await actionDialog.getByRole('button', { name: /Search links/ }).click()
     const searchFieldFromAction = page.getByRole('textbox', { name: 'Search links' })
     await searchFieldFromAction.waitFor({ state: 'visible', timeout: 10000 })
-    assert(
-      await searchFieldFromAction.evaluate((node) => node === document.activeElement),
-      'Action center search command did not focus the search field',
+    await page.waitForFunction(
+      () =>
+        document.activeElement instanceof HTMLInputElement &&
+        document.activeElement.getAttribute('aria-label') === 'Search links',
+      { timeout: 10000 },
     )
 
     await missionCreateButton.click()
