@@ -546,6 +546,8 @@ const demoLinks = [
   },
 ] as const
 
+const demoSlugs = demoLinks.map((link) => link.slug)
+
 function demoEventTime(daysAgo: number, index: number) {
   const date = new Date()
   date.setUTCDate(date.getUTCDate() - daysAgo)
@@ -648,6 +650,33 @@ function seedDemoWorkspace(origin: string) {
     domain: toDomain(getDomainById(domainId) as DomainRow),
     links: seededLinks,
     eventsSeeded,
+  }
+}
+
+function removeDemoWorkspace() {
+  const links = demoSlugs.map((slug) => getLinkBySlug(slug)).filter((link): link is LinkRow => Boolean(link))
+  let eventsRemoved = 0
+
+  for (const link of links) {
+    const eventResult = db.prepare('DELETE FROM events WHERE linkId = ? AND referrer = ?').run(link.id, demoReferrer)
+    eventsRemoved += Number(eventResult.changes)
+    db.prepare('DELETE FROM links WHERE id = ?').run(link.id)
+  }
+
+  const domain = getDomainByHost(demoHostname)
+  let domainRemoved = false
+  if (domain) {
+    const usage = db.prepare('SELECT COUNT(*) AS count FROM links WHERE domainId = ?').get(domain.id) as { count: number }
+    if (Number(usage.count) === 0) {
+      db.prepare('DELETE FROM domains WHERE id = ?').run(domain.id)
+      domainRemoved = true
+    }
+  }
+
+  return {
+    linksRemoved: links.length,
+    eventsRemoved,
+    domainRemoved,
   }
 }
 
@@ -1145,6 +1174,11 @@ app.post('/api/demo/seed', async (request, reply) => {
     note: 'Demo data uses reserved example.test/example.com values only.',
   })
 })
+
+app.delete('/api/demo/seed', async () => ({
+  ...removeDemoWorkspace(),
+  synthetic: true,
+}))
 
 app.post('/api/import/links.csv', async (request, reply) => {
   const upload = await request.file()

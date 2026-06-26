@@ -160,6 +160,22 @@ async function run() {
     const links = await api('/api/links')
     assert(links.payload.length === 2, `Second seed should keep exactly 2 demo links, got ${links.payload.length}`)
     assert(links.payload.every((link) => link.destination.startsWith('https://example.com/')), 'Demo links must stay example.com-only')
+
+    const remove = await api('/api/demo/seed', { method: 'DELETE' })
+    assert(remove.response.ok, `Demo remove returned ${remove.response.status}: ${remove.text}`)
+    assert(remove.payload.synthetic === true, 'Demo remove must mark its payload as synthetic')
+    assert(remove.payload.linksRemoved === 2, `Expected 2 removed demo links, got ${remove.payload.linksRemoved}`)
+    assert(remove.payload.eventsRemoved === 9, `Expected 9 removed demo events, got ${remove.payload.eventsRemoved}`)
+    assert(remove.payload.domainRemoved === true, 'Unused synthetic demo domain should be removed')
+
+    const emptyLinks = await api('/api/links')
+    assert(emptyLinks.payload.length === 0, `Demo remove should leave no links, got ${emptyLinks.payload.length}`)
+
+    const domains = await api('/api/domains')
+    assert(
+      domains.payload.every((domain) => domain.hostname !== 'demo.example.test'),
+      'Demo remove should clear the unused synthetic domain',
+    )
   } finally {
     child.kill()
   }

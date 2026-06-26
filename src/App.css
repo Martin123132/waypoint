@@ -287,7 +287,7 @@
 
 .mission-chips {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 10px;
   margin-bottom: 14px;
 }
@@ -320,6 +320,57 @@
 
 .mission-chip:disabled svg {
   color: #97a6b7;
+}
+
+.demo-notice {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 14px;
+  padding: 11px 12px;
+  border: 1px solid #bde7df;
+  border-radius: 8px;
+  background: #f0fdfa;
+}
+
+.demo-notice span,
+.demo-notice div {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  gap: 8px;
+}
+
+.demo-notice strong,
+.demo-notice small {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.demo-notice strong {
+  color: #0f766e;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.demo-notice small {
+  color: #475569;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.demo-notice svg {
+  flex: 0 0 auto;
+  color: #0f766e;
+}
+
+.demo-notice .secondary-button {
+  min-height: 32px;
+  padding: 0 10px;
+  font-size: 12px;
 }
 
 .starter-tip {
@@ -1159,6 +1210,27 @@ button:disabled {
   color: #92400e;
 }
 
+.demo-badge {
+  display: inline-flex;
+  align-items: center;
+  width: max-content;
+  min-height: 22px;
+  padding: 3px 8px;
+  border: 1px solid #99f6e4;
+  border-radius: 999px;
+  background: #ecfeff;
+  color: #0f766e;
+  font-size: 11px;
+  font-weight: 900;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.row-main strong .demo-badge {
+  margin-left: 8px;
+  vertical-align: middle;
+}
+
 .detail-panel {
   min-width: 0;
 }
@@ -1743,6 +1815,15 @@ button:disabled {
 
   .mission-chips {
     grid-template-columns: 1fr;
+  }
+
+  .demo-notice {
+    grid-template-columns: 1fr;
+  }
+
+  .demo-notice span,
+  .demo-notice div {
+    flex-wrap: wrap;
   }
 
   .starter-tip {

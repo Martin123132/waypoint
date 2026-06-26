@@ -2,6 +2,7 @@ import type {
   AuthInput,
   AuthStatus,
   CreateLinkInput,
+  DemoRemoveResult,
   DemoSeedResult,
   DomainInput,
   DomainSummary,
@@ -100,6 +101,20 @@ export function seedDemoWorkspace() {
     method: 'POST',
     body: JSON.stringify({}),
   })
+}
+
+export async function removeDemoWorkspace() {
+  const response = await fetch('/api/demo/seed', {
+    method: 'DELETE',
+    credentials: 'same-origin',
+  })
+
+  if (!response.ok) {
+    const payload = await response.json().catch(() => ({ error: response.statusText }))
+    throw new Error(payload.error ?? response.statusText)
+  }
+
+  return response.json() as Promise<DemoRemoveResult>
 }
 
 export async function importLinksCsv(file: File) {

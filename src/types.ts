@@ -104,3 +104,10 @@ export type DemoSeedResult = {
   links: LinkSummary[]
   eventsSeeded: number
 }
+
+export type DemoRemoveResult = {
+  synthetic: true
+  linksRemoved: number
+  eventsRemoved: number
+  domainRemoved: boolean
+}

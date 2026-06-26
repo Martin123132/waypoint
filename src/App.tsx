@@ -36,6 +36,7 @@ import {
   listLinks,
   login,
   logout,
+  removeDemoWorkspace,
   seedDemoWorkspace,
   setupWorkspace,
   updateDomain,
@@ -65,7 +66,7 @@ type LinkDraft = {
   qrBackground: string
 }
 
-type LinkFilter = 'all' | 'live' | 'paused' | 'branded' | 'fallback'
+type LinkFilter = 'all' | 'live' | 'paused' | 'branded' | 'fallback' | 'demo'
 type ActionKey = 'new' | 'search' | 'brand-domain' | 'apply-brand' | 'copy' | 'analytics' | 'demo'
 
 const emptyCreateForm: CreateLinkInput = {
@@ -125,6 +126,12 @@ function previewSlug(input?: string) {
       .replace(/^-+|-+$/g, '')
       .slice(0, 48) || 'auto-generated'
   )
+}
+
+const syntheticDemoSlugs = new Set(['demo-launch', 'demo-menu'])
+
+function isSyntheticDemoLink(link: LinkSummary) {
+  return syntheticDemoSlugs.has(link.slug) && link.destination.startsWith('https://example.com/waypoint-demo/')
 }
 
 function isHttpUrl(value: string) {
@@ -363,7 +370,8 @@ function Dashboard({ user, onLogout }: { user: AuthUser | null; onLogout: () => 
         (linkFilter === 'live' && link.active) ||
         (linkFilter === 'paused' && !link.active) ||
         (linkFilter === 'branded' && Boolean(link.domainHostname)) ||
-        (linkFilter === 'fallback' && !link.domainHostname)
+        (linkFilter === 'fallback' && !link.domainHostname) ||
+        (linkFilter === 'demo' && isSyntheticDemoLink(link))
 
       if (!matchesFilter) {
         return false
@@ -386,6 +394,7 @@ function Dashboard({ user, onLogout }: { user: AuthUser | null; onLogout: () => 
     { key: 'paused', label: 'Paused' },
     { key: 'branded', label: 'Branded' },
     { key: 'fallback', label: 'Fallback' },
+    { key: 'demo', label: 'Demo' },
   ]
 
   const maxDailyScans = useMemo(() => {
@@ -394,6 +403,7 @@ function Dashboard({ user, onLogout }: { user: AuthUser | null; onLogout: () => 
 
   const primaryDomain = useMemo(() => domains.find((domain) => domain.isPrimary), [domains])
   const hasBrandedLink = useMemo(() => links.some((link) => Boolean(link.domainHostname)), [links])
+  const hasDemoLinks = useMemo(() => links.some(isSyntheticDemoLink), [links])
   const guideSteps = useMemo(
     () => [
       {
@@ -527,6 +537,7 @@ function Dashboard({ user, onLogout }: { user: AuthUser | null; onLogout: () => 
   }, [domains.length, links.length, primaryDomain, selected, totals.scans])
   const activeCopyFallback = copyFallback?.linkId === selected?.id ? copyFallback : null
   const canShareSelected = Boolean(selected)
+  const selectedIsDemo = selected ? isSyntheticDemoLink(selected) : false
   const shouldOfferDemo = links.length === 0 || totals.scans === 0
   const hasActiveFilters = Boolean(linkSearch.trim()) || linkFilter !== 'all'
   const recommendedAction = useMemo<ActionKey>(() => {
@@ -990,6 +1001,23 @@ function Dashboard({ user, onLogout }: { user: AuthUser | null; onLogout: () => 
     }
   }
 
+  async function handleRemoveDemoWorkspace() {
+    setBusy('remove-demo')
+    setError('')
+
+    try {
+      const result = await removeDemoWorkspace()
+      await refreshDomains()
+      await refreshLinks()
+      setLinkFilter((current) => (current === 'demo' ? 'all' : current))
+      flash(`Synthetic demo removed: ${result.linksRemoved} routes`)
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : 'Could not remove synthetic demo')
+    } finally {
+      setBusy('')
+    }
+  }
+
   async function handleDelete() {
     if (!selected) {
       return
@@ -1243,6 +1271,24 @@ function Dashboard({ user, onLogout }: { user: AuthUser | null; onLogout: () => 
           </button>
         </section>
 
+        {hasDemoLinks ? (
+          <section className="demo-notice" aria-label="Synthetic demo data">
+            <span>
+              <BarChart3 size={16} />
+              <strong>Synthetic demo active</strong>
+              <small>Reserved fake domain and example.com payloads only.</small>
+            </span>
+            <div>
+              <button className="secondary-button" onClick={() => setLinkFilter('demo')} type="button">
+                View demo
+              </button>
+              <button className="secondary-button" disabled={busy === 'remove-demo'} onClick={() => void handleRemoveDemoWorkspace()} type="button">
+                {busy === 'remove-demo' ? 'Removing' : 'Remove demo'}
+              </button>
+            </div>
+          </section>
+        ) : null}
+
         <section className="action-dock" aria-label="Quick actions">
           <button className="dock-action action-center-trigger" onClick={() => setActionCenterOpen(true)} title="Open actions" type="button">
             <Compass size={17} />
@@ -1371,6 +1417,20 @@ function Dashboard({ user, onLogout }: { user: AuthUser | null; onLogout: () => 
                     {recommendedAction === 'demo' ? <em>Recommended</em> : null}
                   </span>
                 </button>
+                {hasDemoLinks ? (
+                  <button
+                    className="action-command"
+                    disabled={busy === 'remove-demo'}
+                    onClick={() => void runAsyncAction(handleRemoveDemoWorkspace)}
+                    type="button"
+                  >
+                    <Trash2 size={18} />
+                    <span>
+                      <strong>{busy === 'remove-demo' ? 'Removing demo' : 'Remove synthetic demo'}</strong>
+                      <small>Deletes only Waypoint's reserved demo routes</small>
+                    </span>
+                  </button>
+                ) : null}
                 <a className="action-command" href="/api/export/qr.zip" onClick={() => setActionCenterOpen(false)}>
                   <PackageCheck size={18} />
                   <span>
@@ -1812,7 +1872,10 @@ function Dashboard({ user, onLogout }: { user: AuthUser | null; onLogout: () => 
                     }}
                   >
                     <span className="row-main">
-                      <strong>{link.title}</strong>
+                      <strong>
+                        {link.title}
+                        {isSyntheticDemoLink(link) ? <span className="demo-badge">Synthetic demo</span> : null}
+                      </strong>
                       <small>{link.domainHostname ? `${link.domainHostname}/${link.slug}` : `/r/${link.slug}`}</small>
                     </span>
                     <span className="row-meta">
@@ -1836,6 +1899,7 @@ function Dashboard({ user, onLogout }: { user: AuthUser | null; onLogout: () => 
                     <p>Updated {formatDate(selected.updatedAt)}</p>
                   </div>
                   <div className="status-stack" aria-label="Link status">
+                    {selectedIsDemo ? <span className="demo-badge">Synthetic demo</span> : null}
                     <span className={selected.active ? 'live-pill' : 'paused-pill'}>
                       {selected.active ? 'Live' : 'Paused'}
                     </span>
