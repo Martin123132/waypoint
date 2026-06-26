@@ -210,25 +210,27 @@ async function run() {
 
     const createTitleFieldFromChip = page.getByRole('textbox', { name: 'Title' })
     await createTitleFieldFromChip.waitFor({ state: 'visible', timeout: 10000 })
-    assert(
-      await createTitleFieldFromChip.evaluate((node) => node === document.activeElement),
-      'Create mission chip did not focus the title field',
+    await page.waitForFunction(
+      () => document.activeElement instanceof HTMLInputElement && document.activeElement.labels?.[0]?.textContent?.trim() === 'Title',
+      { timeout: 10000 },
     )
 
     await missionDomainButton.click()
     const missionDomainField = page.getByRole('textbox', { name: 'Hostname' })
     await missionDomainField.waitFor({ state: 'visible', timeout: 10000 })
-    assert(
-      await missionDomainField.evaluate((node) => node === document.activeElement),
-      'Domain mission chip did not focus the hostname field',
+    await page.waitForFunction(
+      () => document.activeElement instanceof HTMLInputElement && document.activeElement.labels?.[0]?.textContent?.trim() === 'Hostname',
+      { timeout: 10000 },
     )
 
     await dockSearchButton.click()
     const dockSearchField = page.getByRole('textbox', { name: 'Search links' })
     await dockSearchField.waitFor({ state: 'visible', timeout: 10000 })
-    assert(
-      await dockSearchField.evaluate((node) => node === document.activeElement),
-      'Search dock action did not focus the search field',
+    await page.waitForFunction(
+      () =>
+        document.activeElement instanceof HTMLInputElement &&
+        document.activeElement.getAttribute('aria-label') === 'Search links',
+      { timeout: 10000 },
     )
 
     await page.getByRole('button', { name: 'Got it' }).click()
