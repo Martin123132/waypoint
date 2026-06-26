@@ -2,6 +2,7 @@ import type {
   AuthInput,
   AuthStatus,
   CreateLinkInput,
+  DemoSeedResult,
   DomainInput,
   DomainSummary,
   ImportResult,
@@ -91,6 +92,13 @@ export function createLink(input: CreateLinkInput) {
   return requestJson<LinkSummary>('/api/links', {
     method: 'POST',
     body: JSON.stringify(input),
+  })
+}
+
+export function seedDemoWorkspace() {
+  return requestJson<DemoSeedResult>('/api/demo/seed', {
+    method: 'POST',
+    body: JSON.stringify({}),
   })
 }
 

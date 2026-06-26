@@ -511,6 +511,146 @@ function recordEvent(request: FastifyRequest, linkId: string) {
   ).run(nanoid(), linkId, nowIso(), referrer, userAgent, classifyDevice(userAgent), classifyBrowser(userAgent))
 }
 
+const demoHostname = 'demo.example.test'
+const demoReferrer = 'https://example.com/synthetic-waypoint-demo'
+
+const demoLinks = [
+  {
+    slug: 'demo-launch',
+    title: 'Synthetic launch route',
+    destination: 'https://example.com/waypoint-demo/launch',
+    description: 'Synthetic demo route with branded-domain routing, fallback URL, QR, and scan activity.',
+    qrForeground: '#063f4a',
+    qrBackground: '#f7fbfc',
+    eventPattern: [
+      { daysAgo: 6, device: 'desktop', browser: 'chrome' },
+      { daysAgo: 5, device: 'mobile', browser: 'safari' },
+      { daysAgo: 4, device: 'mobile', browser: 'chrome' },
+      { daysAgo: 3, device: 'desktop', browser: 'edge' },
+      { daysAgo: 1, device: 'tablet', browser: 'safari' },
+      { daysAgo: 0, device: 'mobile', browser: 'chrome' },
+    ],
+  },
+  {
+    slug: 'demo-menu',
+    title: 'Synthetic fallback route',
+    destination: 'https://example.com/waypoint-demo/menu',
+    description: 'Synthetic fallback-only route for comparing app-hosted and branded paths.',
+    qrForeground: '#172334',
+    qrBackground: '#ffffff',
+    eventPattern: [
+      { daysAgo: 8, device: 'desktop', browser: 'firefox' },
+      { daysAgo: 2, device: 'mobile', browser: 'safari' },
+      { daysAgo: 0, device: 'desktop', browser: 'chrome' },
+    ],
+  },
+] as const
+
+function demoEventTime(daysAgo: number, index: number) {
+  const date = new Date()
+  date.setUTCDate(date.getUTCDate() - daysAgo)
+  date.setUTCHours(10 + (index % 8), 15 + index, 0, 0)
+  return date.toISOString()
+}
+
+function seedDemoWorkspace(origin: string) {
+  const createdAt = nowIso()
+  const existingDomain = getDomainByHost(demoHostname)
+  const domainId = existingDomain?.id ?? nanoid()
+
+  if (existingDomain) {
+    db.prepare('UPDATE domains SET label = ?, status = ?, updatedAt = ? WHERE id = ?').run(
+      'Synthetic demo domain',
+      'active',
+      createdAt,
+      domainId,
+    )
+  } else {
+    db.prepare(
+      `INSERT INTO domains (id, hostname, label, status, isPrimary, createdAt, updatedAt)
+       VALUES (?, ?, ?, 'active', ?, ?, ?)`,
+    ).run(domainId, demoHostname, 'Synthetic demo domain', getPrimaryDomain() ? 0 : 1, createdAt, createdAt)
+  }
+
+  const seededLinks: ReturnType<typeof toSummary>[] = []
+  let eventsSeeded = 0
+
+  for (const [linkIndex, demo] of demoLinks.entries()) {
+    const existing = getLinkBySlug(demo.slug)
+    const linkId = existing?.id ?? nanoid()
+    const linkDomainId = linkIndex === 0 ? domainId : null
+
+    if (existing) {
+      db.prepare(
+        `UPDATE links
+         SET domainId = ?,
+             title = ?,
+             destination = ?,
+             description = ?,
+             active = 1,
+             trackScans = 1,
+             qrForeground = ?,
+             qrBackground = ?,
+             updatedAt = ?
+         WHERE id = ?`,
+      ).run(
+        linkDomainId,
+        demo.title,
+        demo.destination,
+        demo.description,
+        demo.qrForeground,
+        demo.qrBackground,
+        createdAt,
+        linkId,
+      )
+    } else {
+      db.prepare(
+        `INSERT INTO links
+          (id, domainId, slug, title, destination, description, active, trackScans, qrForeground, qrBackground, createdAt, updatedAt)
+         VALUES (?, ?, ?, ?, ?, ?, 1, 1, ?, ?, ?, ?)`,
+      ).run(
+        linkId,
+        linkDomainId,
+        demo.slug,
+        demo.title,
+        demo.destination,
+        demo.description,
+        demo.qrForeground,
+        demo.qrBackground,
+        createdAt,
+        createdAt,
+      )
+    }
+
+    db.prepare('DELETE FROM events WHERE linkId = ? AND referrer = ?').run(linkId, demoReferrer)
+
+    for (const [eventIndex, event] of demo.eventPattern.entries()) {
+      db.prepare(
+        `INSERT INTO events (id, linkId, occurredAt, referrer, userAgent, device, browser)
+         VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      ).run(
+        nanoid(),
+        linkId,
+        demoEventTime(event.daysAgo, eventIndex + linkIndex),
+        demoReferrer,
+        `Waypoint synthetic demo ${event.browser}/${event.device}`,
+        event.device,
+        event.browser,
+      )
+      eventsSeeded += 1
+    }
+
+    const row = getLinkSummaryById(linkId, new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()) as LinkSummaryRow
+    seededLinks.push(toSummary(row, origin))
+  }
+
+  return {
+    domain: toDomain(getDomainById(domainId) as DomainRow),
+    links: seededLinks,
+    eventsSeeded,
+  }
+}
+
 function csvEscape(value: unknown) {
   const text = String(value ?? '')
   if (/[",\n\r]/.test(text)) {
@@ -995,6 +1135,15 @@ app.post('/api/links', async (request, reply) => {
   const since24 = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
   const row = getLinkSummaryById(inserted.id, since24) as LinkSummaryRow
   return reply.code(201).send(toSummary(row, getOrigin(request)))
+})
+
+app.post('/api/demo/seed', async (request, reply) => {
+  const seeded = seedDemoWorkspace(getOrigin(request))
+  return reply.code(201).send({
+    ...seeded,
+    synthetic: true,
+    note: 'Demo data uses reserved example.test/example.com values only.',
+  })
 })
 
 app.post('/api/import/links.csv', async (request, reply) => {

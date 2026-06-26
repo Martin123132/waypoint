@@ -96,3 +96,11 @@ export type DomainInput = {
   label?: string
   isPrimary?: boolean
 }
+
+export type DemoSeedResult = {
+  synthetic: true
+  note: string
+  domain: DomainSummary
+  links: LinkSummary[]
+  eventsSeeded: number
+}

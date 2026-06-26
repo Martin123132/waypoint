@@ -36,6 +36,7 @@ import {
   listLinks,
   login,
   logout,
+  seedDemoWorkspace,
   setupWorkspace,
   updateDomain,
   updateLink,
@@ -65,7 +66,7 @@ type LinkDraft = {
 }
 
 type LinkFilter = 'all' | 'live' | 'paused' | 'branded' | 'fallback'
-type ActionKey = 'new' | 'search' | 'brand-domain' | 'apply-brand' | 'copy' | 'analytics'
+type ActionKey = 'new' | 'search' | 'brand-domain' | 'apply-brand' | 'copy' | 'analytics' | 'demo'
 
 const emptyCreateForm: CreateLinkInput = {
   title: '',
@@ -526,6 +527,7 @@ function Dashboard({ user, onLogout }: { user: AuthUser | null; onLogout: () => 
   }, [domains.length, links.length, primaryDomain, selected, totals.scans])
   const activeCopyFallback = copyFallback?.linkId === selected?.id ? copyFallback : null
   const canShareSelected = Boolean(selected)
+  const shouldOfferDemo = links.length === 0 || totals.scans === 0
   const hasActiveFilters = Boolean(linkSearch.trim()) || linkFilter !== 'all'
   const recommendedAction = useMemo<ActionKey>(() => {
     if (links.length === 0) {
@@ -971,6 +973,23 @@ function Dashboard({ user, onLogout }: { user: AuthUser | null; onLogout: () => 
     }
   }
 
+  async function handleSeedDemoWorkspace() {
+    setBusy('demo')
+    setError('')
+
+    try {
+      const result = await seedDemoWorkspace()
+      await refreshDomains()
+      await refreshLinks(result.links[0]?.id)
+      jumpToPanel('#analytics')
+      flash(`Synthetic demo loaded: ${result.eventsSeeded} scans`)
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : 'Could not load synthetic demo')
+    } finally {
+      setBusy('')
+    }
+  }
+
   async function handleDelete() {
     if (!selected) {
       return
@@ -1218,6 +1237,10 @@ function Dashboard({ user, onLogout }: { user: AuthUser | null; onLogout: () => 
             <Copy size={16} />
             <span>Share link</span>
           </button>
+          <button className="mission-chip" disabled={busy === 'demo'} onClick={() => void handleSeedDemoWorkspace()} type="button">
+            <BarChart3 size={16} />
+            <span>{busy === 'demo' ? 'Loading demo' : 'Load demo'}</span>
+          </button>
         </section>
 
         <section className="action-dock" aria-label="Quick actions">
@@ -1333,6 +1356,19 @@ function Dashboard({ user, onLogout }: { user: AuthUser | null; onLogout: () => 
                     <strong>View analytics</strong>
                     <small>{selected ? `${selected.scans} scans captured` : 'Select a route first'}</small>
                     {recommendedAction === 'analytics' ? <em>Recommended</em> : null}
+                  </span>
+                </button>
+                <button
+                  className={actionCommandClass('demo')}
+                  disabled={busy === 'demo'}
+                  onClick={() => void runAsyncAction(handleSeedDemoWorkspace)}
+                  type="button"
+                >
+                  <BarChart3 size={18} />
+                  <span>
+                    <strong>{busy === 'demo' ? 'Loading synthetic demo' : 'Load synthetic demo'}</strong>
+                    <small>Fake domain, example.com payloads, and sample scans</small>
+                    {recommendedAction === 'demo' ? <em>Recommended</em> : null}
                   </span>
                 </button>
                 <a className="action-command" href="/api/export/qr.zip" onClick={() => setActionCenterOpen(false)}>
@@ -1735,10 +1771,16 @@ function Dashboard({ user, onLogout }: { user: AuthUser | null; onLogout: () => 
                     <QrCode size={34} />
                     <strong>No links yet.</strong>
                     <span>Create one route and Waypoint will generate the redirect, QR, and fallback path.</span>
-                    <button className="secondary-button" onClick={jumpToCreate} type="button">
-                      <Plus size={16} />
-                      Create first code
-                    </button>
+                    <div className="empty-actions">
+                      <button className="secondary-button" onClick={jumpToCreate} type="button">
+                        <Plus size={16} />
+                        Create first code
+                      </button>
+                      <button className="secondary-button" disabled={busy === 'demo'} onClick={() => void handleSeedDemoWorkspace()} type="button">
+                        <BarChart3 size={16} />
+                        {busy === 'demo' ? 'Loading demo' : 'Load demo'}
+                      </button>
+                    </div>
                   </div>
                 ) : null}
                 {links.length > 0 && filteredLinks.length === 0 ? (
@@ -2126,6 +2168,11 @@ function Dashboard({ user, onLogout }: { user: AuthUser | null; onLogout: () => 
                     <button className="secondary-button" onClick={resetLinkView} type="button">
                       <RefreshCw size={16} />
                       Reset view
+                    </button>
+                  ) : shouldOfferDemo ? (
+                    <button className="secondary-button" disabled={busy === 'demo'} onClick={() => void handleSeedDemoWorkspace()} type="button">
+                      <BarChart3 size={16} />
+                      {busy === 'demo' ? 'Loading demo' : 'Load demo'}
                     </button>
                   ) : (
                     <button className="secondary-button" onClick={jumpToDomains} type="button">
