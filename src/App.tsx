@@ -1212,7 +1212,7 @@ function Dashboard({ user, onLogout }: { user: AuthUser | null; onLogout: () => 
         <header className="topbar">
           <div>
             <h1>Waypoint links</h1>
-            <p>{links.length} managed destinations</p>
+            <p>{links.length} routes ready for QR, fallback, and scan tracking</p>
           </div>
           <div className="topbar-actions">
             {notice ? (
@@ -1244,7 +1244,7 @@ function Dashboard({ user, onLogout }: { user: AuthUser | null; onLogout: () => 
           <section className="starter-tip" aria-label="Welcome tip">
             <p>
               Try <strong>N = New</strong>, <strong>/ = Search</strong>, <strong>D = Domains</strong>.
-              Use these shortcuts to jump around quickly.
+              Use the action center when you want the next clean move.
             </p>
             <button className="secondary-button" onClick={dismissStarterTip} type="button">
               Got it
@@ -1276,7 +1276,7 @@ function Dashboard({ user, onLogout }: { user: AuthUser | null; onLogout: () => 
             <span>
               <BarChart3 size={16} />
               <strong>Synthetic demo active</strong>
-              <small>Reserved fake domain and example.com payloads only.</small>
+              <small>Fake domain, example.com payloads, removable any time.</small>
             </span>
             <div>
               <button className="secondary-button" onClick={() => setLinkFilter('demo')} type="button">
@@ -1342,7 +1342,7 @@ function Dashboard({ user, onLogout }: { user: AuthUser | null; onLogout: () => 
                   <Plus size={18} />
                   <span>
                     <strong>New code</strong>
-                    <small>Create a dynamic QR route</small>
+                    <small>Create an editable QR route</small>
                     {recommendedAction === 'new' ? <em>Recommended</em> : null}
                   </span>
                 </button>
@@ -1413,7 +1413,7 @@ function Dashboard({ user, onLogout }: { user: AuthUser | null; onLogout: () => 
                   <BarChart3 size={18} />
                   <span>
                     <strong>{busy === 'demo' ? 'Loading synthetic demo' : 'Load synthetic demo'}</strong>
-                    <small>Fake domain, example.com payloads, and sample scans</small>
+                    <small>Safe fake domain, sample scans, removable any time</small>
                     {recommendedAction === 'demo' ? <em>Recommended</em> : null}
                   </span>
                 </button>
@@ -1830,7 +1830,7 @@ function Dashboard({ user, onLogout }: { user: AuthUser | null; onLogout: () => 
                   <div className="empty-state guided-empty">
                     <QrCode size={34} />
                     <strong>No links yet.</strong>
-                    <span>Create one route and Waypoint will generate the redirect, QR, and fallback path.</span>
+                    <span>Create one route to get an editable redirect, QR download, fallback path, and scan view.</span>
                     <div className="empty-actions">
                       <button className="secondary-button" onClick={jumpToCreate} type="button">
                         <Plus size={16} />
@@ -1873,8 +1873,8 @@ function Dashboard({ user, onLogout }: { user: AuthUser | null; onLogout: () => 
                   >
                     <span className="row-main">
                       <strong>
-                        {link.title}
-                        {isSyntheticDemoLink(link) ? <span className="demo-badge">Synthetic demo</span> : null}
+                        <span>{link.title}</span>
+                        {isSyntheticDemoLink(link) ? <span className="demo-badge">Demo</span> : null}
                       </strong>
                       <small>{link.domainHostname ? `${link.domainHostname}/${link.slug}` : `/r/${link.slug}`}</small>
                     </span>
@@ -1983,7 +1983,7 @@ function Dashboard({ user, onLogout }: { user: AuthUser | null; onLogout: () => 
                       <img src={`${selected.qrSvgUrl}?v=${selected.updatedAt}`} alt={`${selected.title} QR code`} />
                     </div>
                     <div className="share-card" aria-label="Share this code">
-                      <span>Share kit</span>
+                      <span>QR and link</span>
                       <strong>{selected.shortUrl}</strong>
                       {selected.domainHostname ? <small>Fallback: {selected.fallbackUrl}</small> : <small>Fallback path ready</small>}
                       <div className="share-badges" aria-label="Share readiness">
@@ -2218,7 +2218,7 @@ function Dashboard({ user, onLogout }: { user: AuthUser | null; onLogout: () => 
                 <h2>{links.length === 0 ? 'Ready for the first route' : 'Choose the next route'}</h2>
                 <p>
                   {links.length === 0
-                    ? 'Create a code to open the share kit, QR downloads, and analytics here.'
+                    ? 'Create a code to open QR downloads, link sharing, and analytics here.'
                     : hasActiveFilters
                       ? 'Reset the current view or create another code from here.'
                       : 'Select a saved link or start a new one from the actions above.'}

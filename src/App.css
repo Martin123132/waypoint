@@ -1155,7 +1155,6 @@ button:disabled {
   min-width: 0;
 }
 
-.row-main strong,
 .row-main small,
 .row-meta small {
   overflow: hidden;
@@ -1164,7 +1163,18 @@ button:disabled {
 }
 
 .row-main strong {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
   font-size: 14px;
+}
+
+.row-main strong > span:first-child {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .row-main small,
@@ -1227,8 +1237,7 @@ button:disabled {
 }
 
 .row-main strong .demo-badge {
-  margin-left: 8px;
-  vertical-align: middle;
+  flex: 0 0 auto;
 }
 
 .detail-panel {

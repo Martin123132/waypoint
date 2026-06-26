@@ -12,6 +12,7 @@ Waypoint is a self-hosted dynamic QR code and short-link manager. It is intended
 - License: PolyForm Noncommercial License 1.0.0; commercial use requires a separate written license
 - Verification: `npm run verify`
 - CI: GitHub Actions runs the same verification path on pushes and pull requests
+- Product state: dynamic QR/short-link routes, branded-domain routing, CSV import/export, QR ZIP export, scan analytics, guided dashboard actions, and removable synthetic demo data
 
 ## Important Compatibility Notes
 
@@ -33,6 +34,8 @@ Reports should use synthetic domains, URLs, screenshots, and CSV rows. Do not po
 ## Public Proof Fixtures
 
 `examples/synthetic-routing-demo.json` documents a safe branded-domain and QR-flow scenario with reserved example domains and an `example.com` destination. It is checked by `npm run test:examples` and the full `npm run verify` path.
+
+The dashboard also includes a removable synthetic demo mode. It seeds only `demo.example.test`, `https://example.com/waypoint-demo/...` destinations, and sample scan events. The demo data is marked in-app, filterable with the Demo filter, and removable without touching non-demo routes.
 
 ## Release Readiness
 

@@ -167,7 +167,7 @@ async function run() {
     await dockSearchButton.waitFor({ timeout: 10000 })
     await dockDomainButton.waitFor({ timeout: 10000 })
     await page.getByText('Ready for the first route').waitFor({ timeout: 10000 })
-    await page.getByText('Create a code to open the share kit, QR downloads, and analytics here.').waitFor({ timeout: 10000 })
+    await page.getByText('Create a code to open QR downloads, link sharing, and analytics here.').waitFor({ timeout: 10000 })
     assert(await missionShareButton.isDisabled(), 'Share mission chip should be disabled without a selected link')
 
     await actionCenterButton.click()
@@ -286,7 +286,7 @@ async function run() {
     await createPanel.getByRole('button', { name: /Create code/ }).click()
     const detailPanel = page.locator('.detail-panel')
     const shareCard = detailPanel.locator('.share-card')
-    await detailPanel.getByText('Share kit').waitFor({ timeout: 10000 })
+    await detailPanel.getByText('QR and link').waitFor({ timeout: 10000 })
     await shareCard.getByText(`${baseUrl}/r/${slug}`).waitFor({ timeout: 10000 })
     await detailPanel.getByText('Route health').waitFor({ timeout: 10000 })
     await detailPanel.getByText('Ready to share').waitFor({ timeout: 10000 })

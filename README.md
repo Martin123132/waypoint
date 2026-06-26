@@ -4,6 +4,19 @@
 
 Waypoint is a self-hosted dynamic QR code and short-link manager. Create a short URL, download a QR code, change the destination later, and keep basic scan analytics in a local SQLite database.
 
+It is designed for the everyday QR workflow: make a route, print or share the QR, keep the fallback URL, then update the destination later without reprinting anything.
+
+## What It Does Now
+
+- Create editable QR/short-link routes with SVG QR downloads
+- Keep fallback `/r/:slug` URLs even when a branded domain is attached
+- Add custom branded domains for cleaner public links
+- Import and export links with CSV
+- Export all QR SVGs as a ZIP with a CSV manifest
+- Track per-link scans, with scan capture toggleable per route
+- Preview the full flow with removable synthetic demo data
+- Run locally with SQLite and a first-run admin account
+
 ## Current MVP
 
 - Dynamic short links at `/r/:slug`
@@ -16,6 +29,7 @@ Waypoint is a self-hosted dynamic QR code and short-link manager. Create a short
 - Custom branded domains with app fallback URLs
 - Campaign UTM builder for new and existing links
 - Link search and live/paused/branded/fallback filters
+- Synthetic demo filter and removable demo routes
 - Per-link scan collection control
 - First-run admin setup
 - Password login with HttpOnly session cookie
@@ -73,6 +87,17 @@ Waypoint uses `WAYPOINT_*` names for new installs. Existing `OPENQR_*` variables
 - `WAYPOINT_COOKIE_SECURE`: set to `1` behind HTTPS
 
 On first launch, Waypoint asks you to create the admin account. After that, link management, analytics, QR downloads, and CSV export require a login session. Public redirects at `/r/:slug` stay open.
+
+## Safe Demo Mode
+
+After setup, use **Load demo** in the dashboard to seed a tiny synthetic workspace:
+
+- Reserved demo domain: `demo.example.test`
+- Synthetic destinations under `https://example.com/waypoint-demo/...`
+- Sample scan events for analytics
+- A **Demo** filter and **Remove demo** control
+
+The demo path is intentionally fake-domain/example.com only, so it is safe for screenshots, issue reports, and public proof material. Removing the demo deletes only Waypoint's reserved demo routes and their synthetic scan events.
 
 ## Custom Domains
 
@@ -141,7 +166,7 @@ You can disable scan capture per destination directly from create and detail vie
 npm run verify
 ```
 
-`npm run verify` runs lint, the production build, the domain-routing integration test, and the guided UI test. For narrower checks, use `npm run lint`, `npm run build`, `npm run test:domain`, or `npm run test:ui`.
+`npm run verify` runs lint, storage/readiness/example checks, the UTM test, the production build, the domain-routing integration test, the demo seed/remove regression, and the guided UI test. For narrower checks, use `npm run lint`, `npm run build`, `npm run test:domain`, `npm run test:demo`, or `npm run test:ui`.
 
 `npm test` runs the production build and then the domain-routing integration test. The test starts Waypoint on an isolated local port and writes its temporary SQLite database under `D:\CodexCache\waypoint\tests` by default. Override with `WAYPOINT_TEST_ROOT` and `WAYPOINT_TEMP_ROOT` if needed. The older `OPENQR_TEST_ROOT` and `OPENQR_TEMP_ROOT` names still work as fallbacks.
 
@@ -152,11 +177,12 @@ $env:PLAYWRIGHT_BROWSERS_PATH='D:\CodexCache\playwright'
 npx playwright install chromium
 ```
 
-## Roadmap
+## Near-Term Polish
 
-- API keys
-- Team accounts
-- Public audit and retention docs
+- Screenshots or a short demo GIF for the README
+- Import preview before CSV rows are committed
+- Clearer scan breakdown cards for device, browser, and referrer
+- Public audit and retention notes
 
 ## Project Docs
 
