@@ -15,6 +15,8 @@ const requiredFiles = [
   'SECURITY.md',
   'LOCAL_STORAGE_POLICY.md',
   'PROJECT_STATUS.md',
+  'docs/deployment.md',
+  'docs/privacy-retention.md',
   'docs/release-review-outcome-template.md',
   'docs/release-review-outcome.sample.md',
   'scripts/generate-release-review-outcome.mjs',
@@ -78,6 +80,8 @@ assertIncludes('README.md', '[Contributing](CONTRIBUTING.md)')
 assertIncludes('README.md', '[Security Policy](SECURITY.md)')
 assertIncludes('README.md', '[Project Status](PROJECT_STATUS.md)')
 assertIncludes('README.md', '[Local Storage Policy](LOCAL_STORAGE_POLICY.md)')
+assertIncludes('README.md', '[Deployment Guide](docs/deployment.md)')
+assertIncludes('README.md', '[Privacy and Retention Notes](docs/privacy-retention.md)')
 assertIncludes('README.md', '[COMMERCIAL-LICENSE.md](COMMERCIAL-LICENSE.md)')
 assertIncludes('README.md', '[Release review outcome template](docs/release-review-outcome-template.md)')
 assertIncludes('README.md', '[Release review dry-run sample](docs/release-review-outcome.sample.md)')
@@ -90,6 +94,8 @@ assertIncludes('PROJECT_STATUS.md', 'Public Issue Intake')
 assertIncludes('PROJECT_STATUS.md', 'synthetic domains, URLs, screenshots, and CSV rows')
 assertIncludes('PROJECT_STATUS.md', 'Do not post secrets')
 assertIncludes('PROJECT_STATUS.md', 'Release Readiness')
+assertIncludes('PROJECT_STATUS.md', 'docs/deployment.md')
+assertIncludes('PROJECT_STATUS.md', 'docs/privacy-retention.md')
 assertIncludes('PROJECT_STATUS.md', 'npm run verify')
 assertIncludes('PROJECT_STATUS.md', 'synthetic-only proof material')
 assertIncludes('PROJECT_STATUS.md', 'docs/release-review-outcome-template.md')
@@ -106,6 +112,20 @@ assertIncludes('SECURITY.md', 'GitHub private vulnerability reporting')
 assertIncludes('SECURITY.md', 'avoid posting exploit details')
 assertIncludes('SECURITY.md', 'synthetic data')
 assertIncludes('SECURITY.md', 'Please do not submit live credentials')
+
+assertIncludes('docs/deployment.md', 'WAYPOINT_PUBLIC_URL=https://qr.example.com')
+assertIncludes('docs/deployment.md', 'WAYPOINT_COOKIE_SECURE=1')
+assertIncludes('docs/deployment.md', 'Forward the original `Host` header.')
+assertIncludes('docs/deployment.md', 'WAYPOINT_DB=/var/lib/waypoint/waypoint.sqlite')
+assertIncludes('docs/deployment.md', 'Do not commit SQLite databases')
+assertIncludes('docs/deployment.md', 'Proof screenshots and issue reports use synthetic domains and `example.com` payloads only.')
+
+assertIncludes('docs/privacy-retention.md', 'Waypoint does not intentionally store full IP addresses')
+assertIncludes('docs/privacy-retention.md', 'Scan tracking can be disabled per link.')
+assertIncludes('docs/privacy-retention.md', 'There is no automatic retention job in the MVP.')
+assertIncludes('docs/privacy-retention.md', 'Screenshots generated from the removable synthetic demo.')
+assertIncludes('docs/privacy-retention.md', 'Do not post secrets')
+assertIncludes('docs/privacy-retention.md', 'Treat SQLite backups as sensitive operational data.')
 
 assertIncludes('LICENSE', 'PolyForm Noncommercial License 1.0.0')
 assertIncludes('LICENSE', 'Required Notice: waypoint is source-available for personal and non-commercial use')

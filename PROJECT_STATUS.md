@@ -41,6 +41,10 @@ The dashboard also includes a removable synthetic demo mode. It seeds only `demo
 
 `.github/ISSUE_TEMPLATE/release-review.yml` provides a pre-release review checklist. It requires `npm run verify`, public readiness, the examples verifier, CI on `main`, source-available non-commercial license posture, and synthetic-only proof material. It does not create a release, tag, package, or deployment.
 
+`docs/deployment.md` documents a public-safe reverse-proxy deployment shape, required `WAYPOINT_*` environment variables, custom-domain routing expectations, SQLite persistence, and pre-release deployment checks.
+
+`docs/privacy-retention.md` documents what Waypoint stores, per-link scan tracking control, operator retention responsibilities, and synthetic-only public reporting guidance.
+
 `docs/release-review-outcome-template.md` provides a dry-run evidence record for future release review outcomes. It records local verification, public readiness, examples verification, GitHub Actions CI URL, synthetic demo status, source-available non-commercial license posture, security guidance, and confirmation that proof material contains no real QR payloads, private URLs, secrets, production domains, datasets, or proprietary material.
 
 `npm run release:review:dry-run` prints a sanitized release-review outcome with placeholder CI URL/result fields. Its checked sample is `docs/release-review-outcome.sample.md`.

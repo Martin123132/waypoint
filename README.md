@@ -191,7 +191,7 @@ npx playwright install chromium
 - Screenshots or a short demo GIF for the README
 - Import preview before CSV rows are committed
 - Clearer scan breakdown cards for device, browser, and referrer
-- Public audit and retention notes
+- Import preview before CSV rows are committed
 
 ## Project Docs
 
@@ -199,6 +199,8 @@ npx playwright install chromium
 - [Security Policy](SECURITY.md)
 - [Project Status](PROJECT_STATUS.md)
 - [Local Storage Policy](LOCAL_STORAGE_POLICY.md)
+- [Deployment Guide](docs/deployment.md)
+- [Privacy and Retention Notes](docs/privacy-retention.md)
 - [Synthetic routing demo](examples/synthetic-routing-demo.json)
 - [Release review outcome template](docs/release-review-outcome-template.md)
 - [Release review dry-run sample](docs/release-review-outcome.sample.md)
