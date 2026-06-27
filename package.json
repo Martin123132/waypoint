@@ -14,6 +14,7 @@
     "build": "tsc -b && vite build && tsc -p tsconfig.server.json",
     "ci:d-drive": "node scripts/with-d-drive-cache.mjs npm ci",
     "dev:d-drive": "node scripts/with-d-drive-cache.mjs npm run dev",
+    "docs:screenshots": "npm run build && node scripts/capture-readme-screenshots.mjs",
     "release:review:dry-run": "node scripts/generate-release-review-outcome.mjs",
     "release:review:write": "node scripts/generate-release-review-outcome.mjs --write",
     "start": "node dist-server/index.js",

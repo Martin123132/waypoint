@@ -17,6 +17,14 @@ It is designed for the everyday QR workflow: make a route, print or share the QR
 - Preview the full flow with removable synthetic demo data
 - Run locally with SQLite and a first-run admin account
 
+## Screenshots
+
+The screenshots below use Waypoint's removable synthetic demo only: `demo.example.test`, `example.com` destinations, and sample scan events.
+
+![Waypoint dashboard with synthetic demo routes](docs/assets/waypoint-dashboard-demo.png)
+
+![Waypoint mobile layout with synthetic demo routes](docs/assets/waypoint-mobile-demo.png)
+
 ## Current MVP
 
 - Dynamic short links at `/r/:slug`
@@ -200,6 +208,8 @@ npx playwright install chromium
   [release readiness review](.github/ISSUE_TEMPLATE/release-review.yml)
 
 Generate a local dry-run release-review report with `npm run release:review:write`. It writes to `outputs/release-review-dry-run.md`, which is ignored by git and intended to stay local unless deliberately sanitized.
+
+Refresh the README screenshots with `npm run docs:screenshots`. The capture script starts an isolated local server with a D-drive SQLite database, seeds only the synthetic demo, and writes PNGs to `docs/assets/`.
 
 ## License
 

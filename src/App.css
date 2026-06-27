@@ -1835,6 +1835,11 @@ button:disabled {
     flex-wrap: wrap;
   }
 
+  .demo-notice strong,
+  .demo-notice small {
+    white-space: normal;
+  }
+
   .starter-tip {
     flex-direction: column;
   }
