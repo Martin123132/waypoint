@@ -68,6 +68,7 @@ type LinkDraft = {
 
 type LinkFilter = 'all' | 'live' | 'paused' | 'branded' | 'fallback' | 'demo'
 type ActionKey = 'new' | 'search' | 'brand-domain' | 'apply-brand' | 'copy' | 'analytics' | 'demo'
+type InsightBucket = { label: string; count: number }
 
 const emptyCreateForm: CreateLinkInput = {
   title: '',
@@ -141,6 +142,67 @@ function isHttpUrl(value: string) {
   } catch {
     return false
   }
+}
+
+function titleCase(value: string) {
+  return value ? `${value.slice(0, 1).toUpperCase()}${value.slice(1)}` : 'Unknown'
+}
+
+function referrerLabel(value: string) {
+  if (!value) {
+    return 'Direct / unknown'
+  }
+
+  try {
+    return new URL(value).hostname
+  } catch {
+    return value
+  }
+}
+
+function topBuckets(values: string[], fallback = 'Unknown'): InsightBucket[] {
+  const counts = new Map<string, number>()
+
+  for (const value of values) {
+    const label = value || fallback
+    counts.set(label, (counts.get(label) ?? 0) + 1)
+  }
+
+  return [...counts.entries()]
+    .map(([label, count]) => ({ label, count }))
+    .sort((a, b) => b.count - a.count || a.label.localeCompare(b.label))
+    .slice(0, 4)
+}
+
+function InsightList({
+  items,
+  total,
+  emptyLabel,
+}: {
+  items: InsightBucket[]
+  total: number
+  emptyLabel: string
+}) {
+  if (!items.length || total === 0) {
+    return <div className="empty-state">{emptyLabel}</div>
+  }
+
+  return (
+    <>
+      {items.map((item) => (
+        <div className="insight-row" key={item.label}>
+          <span>
+            <strong>{item.label}</strong>
+            <small>{Math.round((item.count / total) * 100)}%</small>
+          </span>
+          <div className="insight-track">
+            <i style={{ width: `${Math.max(8, (item.count / total) * 100)}%` }} />
+          </div>
+          <em>{item.count}</em>
+        </div>
+      ))}
+    </>
+  )
 }
 
 function MetricCard({
@@ -400,6 +462,20 @@ function Dashboard({ user, onLogout }: { user: AuthUser | null; onLogout: () => 
   const maxDailyScans = useMemo(() => {
     return Math.max(1, ...(analytics?.daily.map((day) => day.scans) ?? [0]))
   }, [analytics])
+  const analyticsEvents = useMemo(() => analytics?.events ?? [], [analytics?.events])
+  const analyticsEventCount = analyticsEvents.length
+  const deviceBreakdown = useMemo(
+    () => topBuckets(analyticsEvents.map((event) => titleCase(event.device))),
+    [analyticsEvents],
+  )
+  const browserBreakdown = useMemo(
+    () => topBuckets(analyticsEvents.map((event) => titleCase(event.browser))),
+    [analyticsEvents],
+  )
+  const referrerBreakdown = useMemo(
+    () => topBuckets(analyticsEvents.map((event) => referrerLabel(event.referrer)), 'Direct / unknown'),
+    [analyticsEvents],
+  )
 
   const primaryDomain = useMemo(() => domains.find((domain) => domain.isPrimary), [domains])
   const hasBrandedLink = useMemo(() => links.some((link) => Boolean(link.domainHostname)), [links])
@@ -2196,18 +2272,54 @@ function Dashboard({ user, onLogout }: { user: AuthUser | null; onLogout: () => 
                     <div className="panel-heading compact">
                       <div>
                         <h3>Recent scans</h3>
-                        <p>{selected.trackScans ? `${analytics?.events.length ?? 0} captured` : 'Tracking disabled'}</p>
+                        <p>{selected.trackScans ? `${analyticsEventCount} captured` : 'Tracking disabled'}</p>
                       </div>
                     </div>
                     <div className="event-table">
-                      {(analytics?.events.length ? analytics.events : []).map((event) => (
+                      {(analyticsEvents.length ? analyticsEvents : []).map((event) => (
                         <div className="event-row" key={event.id}>
                           <span>{formatDate(event.occurredAt)}</span>
                           <span>{event.device}</span>
                           <span>{event.browser}</span>
                         </div>
                       ))}
-                      {analytics?.events.length === 0 ? <div className="empty-state">No scans recorded.</div> : null}
+                      {analyticsEvents.length === 0 ? <div className="empty-state">No scans recorded.</div> : null}
+                    </div>
+                  </div>
+
+                  <div className="analytics-card insight-card">
+                    <div className="panel-heading compact">
+                      <div>
+                        <h3>Device mix</h3>
+                        <p>{analyticsEventCount ? `${analyticsEventCount} recent scans` : 'Waiting for scans'}</p>
+                      </div>
+                    </div>
+                    <div className="insight-list">
+                      <InsightList items={deviceBreakdown} total={analyticsEventCount} emptyLabel="No device mix yet." />
+                    </div>
+                  </div>
+
+                  <div className="analytics-card insight-card">
+                    <div className="panel-heading compact">
+                      <div>
+                        <h3>Browser mix</h3>
+                        <p>{analyticsEventCount ? 'Top recent browsers' : 'Waiting for scans'}</p>
+                      </div>
+                    </div>
+                    <div className="insight-list">
+                      <InsightList items={browserBreakdown} total={analyticsEventCount} emptyLabel="No browser mix yet." />
+                    </div>
+                  </div>
+
+                  <div className="analytics-card insight-card">
+                    <div className="panel-heading compact">
+                      <div>
+                        <h3>Referrers</h3>
+                        <p>{analyticsEventCount ? 'Where recent scans came from' : 'Waiting for scans'}</p>
+                      </div>
+                    </div>
+                    <div className="insight-list">
+                      <InsightList items={referrerBreakdown} total={analyticsEventCount} emptyLabel="No referrers yet." />
                     </div>
                   </div>
                 </section>

@@ -1630,6 +1630,68 @@ button:disabled {
   font-weight: 800;
 }
 
+.insight-card {
+  align-content: start;
+}
+
+.insight-list {
+  display: grid;
+  gap: 10px;
+}
+
+.insight-row {
+  display: grid;
+  grid-template-columns: minmax(110px, 0.85fr) minmax(120px, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+  min-height: 42px;
+  padding: 9px 10px;
+  border-radius: 8px;
+  background: #f8fafc;
+}
+
+.insight-row span {
+  display: grid;
+  min-width: 0;
+  gap: 3px;
+}
+
+.insight-row strong,
+.insight-row small {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.insight-row strong {
+  color: #172334;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.insight-row small,
+.insight-row em {
+  color: #647286;
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 850;
+}
+
+.insight-track {
+  height: 8px;
+  border-radius: 999px;
+  background: #e2e8f0;
+  overflow: hidden;
+}
+
+.insight-track i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: #0ea5a4;
+}
+
 .empty-state,
 .empty-detail {
   display: grid;

@@ -31,6 +31,7 @@ The screenshots below use Waypoint's removable synthetic demo only: `demo.exampl
 - Editable destination URLs
 - SVG QR generation and download
 - Basic scan analytics by link
+- Device, browser, and referrer scan breakdowns
 - CSV export for managed links
 - CSV import with row-level errors
 - Bulk QR ZIP export with SVG files and a CSV manifest
